@@ -1,0 +1,36 @@
+ext.versions = [
+        agp               : '3.3.0',
+        sdk_compile       : 28,
+        sdk_min           : 21,
+        sdk_target        : 28,
+        kotlin            : '1.3.11',
+        androidx_appcompat: '1.0.0-beta01',
+        ktx_core          : '1.1.0-alpha03',
+        constraint_layout : '1.1.2',
+        material          : '1.0.0-beta01'
+]
+
+ext.testVersions = [
+        junit         : '4.12',
+        espresso      : '3.1.0-alpha4',
+        android_runner: '1.1.0-alpha4'
+]
+
+ext.libs = [
+        kotlin_jdk        : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin",
+        androidx_appcompat: "androidx.appcompat:appcompat:$versions.androidx_appcompat",
+        ktx_core          : "androidx.core:core-ktx:$versions.ktx_core",
+        constraint_layout : "androidx.constraintlayout:constraintlayout:$versions.constraint_layout",
+        material          : "com.google.android.material:material:$versions.material"
+]
+
+ext.testLibs = [
+        junit         : "junit:junit:$testVersions.junit",
+        espresso      : "androidx.test.espresso:espresso-core:$testVersions.espresso",
+        android_runner: "androidx.test:runner:$testVersions.android_runner"
+]
+
+ext.gradlePlugins = [
+        android: "com.android.tools.build:gradle:$versions.agp",
+        kotlin : "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
+]
