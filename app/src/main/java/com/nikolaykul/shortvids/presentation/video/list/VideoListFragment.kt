@@ -1,19 +1,19 @@
-package com.nikolaykul.shortvids.presentation.list
+package com.nikolaykul.shortvids.presentation.video.list
 
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nikolaykul.shortvids.R
 import com.nikolaykul.shortvids.presentation.base.BaseFragment
-import com.nikolaykul.shortvids.presentation.list.adapter.ListAdapter
-import com.nikolaykul.shortvids.presentation.list.adapter.ListItem
+import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListAdapter
+import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListItem
 import com.nikolaykul.shortvids.presentation.utils.rv.decorations.VerticalMarginDecorator
-import kotlinx.android.synthetic.main.fragment_list.*
+import kotlinx.android.synthetic.main.fragment_video_list.*
 
-class ListFragment : BaseFragment() {
-    private val adapter = ListAdapter()
+class VideoListFragment : BaseFragment() {
+    private val adapter = VideoListAdapter()
 
-    override val layoutId = R.layout.fragment_list
+    override val layoutId = R.layout.fragment_video_list
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -28,7 +28,7 @@ class ListFragment : BaseFragment() {
     }
 
     private fun populateList() {
-        fun createItem(i: Int) = ListItem(
+        fun createItem(i: Int) = VideoListItem(
             title = "Title for $i",
             subTitle = "Some lorem ipsum for the $i item",
             videoPath = "Actually there's no any videoPath at the moment"
@@ -39,6 +39,6 @@ class ListFragment : BaseFragment() {
     }
 
     companion object {
-        fun newInstance(): ListFragment = ListFragment()
+        fun newInstance(): VideoListFragment = VideoListFragment()
     }
 }

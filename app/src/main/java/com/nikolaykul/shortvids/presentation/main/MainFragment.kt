@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.nikolaykul.shortvids.R
 import com.nikolaykul.shortvids.presentation.base.BaseFragment
-import com.nikolaykul.shortvids.presentation.list.ListFragment
+import com.nikolaykul.shortvids.presentation.video.list.VideoListFragment
 
 class MainFragment : BaseFragment() {
     override val layoutId = R.layout.fragment_main
@@ -15,7 +15,7 @@ class MainFragment : BaseFragment() {
 
     private fun setupList() {
         childFragmentManager.beginTransaction()
-            .replace(R.id.container, ListFragment.newInstance())
+            .replace(R.id.container, VideoListFragment.newInstance())
             .commit()
     }
 }
