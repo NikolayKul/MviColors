@@ -9,6 +9,7 @@ ext.versions = [
         lifecycle         : '2.0.0',
         constraint_layout : '1.1.2',
         material          : '1.0.0-beta01',
+        timber            : '4.7.1',
         dagger            : '2.20',
         rx                : '2.1.0'
 ]
@@ -27,6 +28,7 @@ ext.libs = [
         view_model_ext         : "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle",
         constraint_layout      : "androidx.constraintlayout:constraintlayout:$versions.constraint_layout",
         material               : "com.google.android.material:material:$versions.material",
+        timber                 : "com.jakewharton.timber:timber:$versions.timber",
 
         dagger                 : "com.google.dagger:dagger:$versions.dagger",
         dagger_android         : "com.google.dagger:dagger-android:$versions.dagger",

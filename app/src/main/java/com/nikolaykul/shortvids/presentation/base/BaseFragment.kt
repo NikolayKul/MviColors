@@ -2,7 +2,6 @@ package com.nikolaykul.shortvids.presentation.base
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +17,7 @@ import dagger.android.support.HasSupportFragmentInjector
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import timber.log.Timber
 import javax.inject.Inject
 
 abstract class BaseFragment : Fragment(), HasSupportFragmentInjector {
@@ -52,7 +52,7 @@ abstract class BaseFragment : Fragment(), HasSupportFragmentInjector {
 
     protected fun <T> Observable<T>.safeSubscribe(
         onComplete: () -> Unit = { /* no-op */ },
-        onError: (Throwable) -> Unit = { Log.e(javaClass.simpleName, it.localizedMessage) },
+        onError: (Throwable) -> Unit = Timber::e,
         onNext: (T) -> Unit
     ): Disposable =
         subscribe(onNext, onError, onComplete)

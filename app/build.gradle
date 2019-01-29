@@ -30,6 +30,7 @@ dependencies {
     implementation libs.view_model_ext
     implementation libs.constraint_layout
     implementation libs.material
+    implementation libs.timber
 
     // dagger
     implementation libs.dagger

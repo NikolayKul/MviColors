@@ -1,6 +1,5 @@
 package com.nikolaykul.shortvids.presentation.base
 
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import io.reactivex.Observable
@@ -9,6 +8,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
+import timber.log.Timber
 
 abstract class BaseViewModel<TState : ViewState>(initState: TState) : ViewModel() {
     private val stateRelay by lazy { BehaviorSubject.createDefault(initState) }
@@ -35,7 +35,7 @@ abstract class BaseViewModel<TState : ViewState>(initState: TState) : ViewModel(
     }
 
     protected fun <T> Single<T>.safeSubscribe(
-        onError: (Throwable) -> Unit = { Log.e(javaClass.simpleName, it.localizedMessage) },
+        onError: (Throwable) -> Unit = Timber::e,
         onSuccess: (T) -> Unit
     ): Disposable =
         subscribe(onSuccess, onError)

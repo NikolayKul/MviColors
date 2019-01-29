@@ -9,6 +9,7 @@ import com.nikolaykul.shortvids.presentation.base.BaseFragment
 import com.nikolaykul.shortvids.presentation.utils.rv.decorations.VerticalMarginDecorator
 import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListAdapter
 import kotlinx.android.synthetic.main.fragment_video_list.*
+import timber.log.Timber
 
 class VideoListFragment : BaseFragment() {
     override val layoutId = R.layout.fragment_video_list
@@ -25,6 +26,8 @@ class VideoListFragment : BaseFragment() {
     }
 
     private fun handleState(state: VideoListState) {
+        Timber.d("NextState -> $state")
+
         state.errorMsg?.let {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
