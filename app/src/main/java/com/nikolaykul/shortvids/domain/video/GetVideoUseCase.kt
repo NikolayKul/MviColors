@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetVideoUseCase @Inject constructor() {
 
     fun getVideo(): Single<List<VideoItem>> =
-        Single.timer(1000L, TimeUnit.MILLISECONDS)
+        Single.timer(2500L, TimeUnit.MILLISECONDS)
             .map { createVideos() }
             .subscribeOn(Schedulers.io())
 
