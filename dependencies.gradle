@@ -6,6 +6,7 @@ ext.versions = [
         kotlin            : '1.3.11',
         androidx_appcompat: '1.0.0-beta01',
         ktx_core          : '1.1.0-alpha03',
+        lifecycle         : '2.0.0',
         constraint_layout : '1.1.2',
         material          : '1.0.0-beta01',
         dagger            : '2.20'
@@ -21,6 +22,8 @@ ext.libs = [
         kotlin_jdk             : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin",
         androidx_appcompat     : "androidx.appcompat:appcompat:$versions.androidx_appcompat",
         ktx_core               : "androidx.core:core-ktx:$versions.ktx_core",
+        view_model             : "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycle",
+        view_model_ext         : "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle",
         constraint_layout      : "androidx.constraintlayout:constraintlayout:$versions.constraint_layout",
         material               : "com.google.android.material:material:$versions.material",
 
