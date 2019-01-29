@@ -2,12 +2,12 @@ package com.nikolaykul.shortvids.presentation.video.list
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nikolaykul.shortvids.R
 import com.nikolaykul.shortvids.presentation.base.BaseFragment
 import com.nikolaykul.shortvids.presentation.utils.rv.decorations.VerticalMarginDecorator
 import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListAdapter
-import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListItem
 import kotlinx.android.synthetic.main.fragment_video_list.*
 
 class VideoListFragment : BaseFragment() {
@@ -20,26 +20,28 @@ class VideoListFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         initList()
 
-        viewModel.sayHi()
+        viewModel.observeState()
+            .safeSubscribe { handleState(it) }
+    }
 
-        populateList()
+    private fun handleState(state: VideoListState) {
+        state.errorMsg?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }
+
+        state.isLoading?.let {
+            Toast.makeText(context, "IsLoading = $it", Toast.LENGTH_SHORT).show()
+        }
+
+        state.items?.let {
+            adapter.addItems(it)
+        }
     }
 
     private fun initList() {
         rvVids.adapter = adapter
         rvVids.layoutManager = LinearLayoutManager(context)
         rvVids.addItemDecoration(VerticalMarginDecorator.withDimen(R.dimen.space_default))
-    }
-
-    private fun populateList() {
-        fun createItem(i: Int) = VideoListItem(
-            title = "Title for $i",
-            subTitle = "Some lorem ipsum for the $i item",
-            videoPath = "Actually there's no any videoPath at the moment"
-        )
-
-        val items = (0..100).map(::createItem)
-        adapter.addItems(items)
     }
 
     companion object {
