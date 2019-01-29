@@ -11,7 +11,8 @@ ext.versions = [
         material          : '1.0.0-beta01',
         timber            : '4.7.1',
         dagger            : '2.20',
-        rx                : '2.1.0'
+        rx                : '2.1.0',
+        rx_binding        : '3.0.0-alpha2'
 ]
 
 ext.testVersions = [
@@ -37,7 +38,8 @@ ext.libs = [
         dagger_android_compiler: "com.google.dagger:dagger-android-processor:$versions.dagger",
 
         rx_android             : "io.reactivex.rxjava2:rxandroid:$versions.rx",
-        rx_java                : "io.reactivex.rxjava2:rxjava:$versions.rx"
+        rx_java                : "io.reactivex.rxjava2:rxjava:$versions.rx",
+        rx_binding             : "com.jakewharton.rxbinding3:rxbinding-core:$versions.rx_binding"
 ]
 
 ext.testLibs = [

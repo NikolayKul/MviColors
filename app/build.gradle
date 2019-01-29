@@ -41,6 +41,7 @@ dependencies {
 
     implementation libs.rx_android
     implementation libs.rx_java
+    implementation libs.rx_binding
 
     testImplementation testLibs.junit
     androidTestImplementation testLibs.espresso

@@ -5,14 +5,17 @@ import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.jakewharton.rxbinding3.widget.textChanges
 import com.nikolaykul.shortvids.R
 import com.nikolaykul.shortvids.presentation.base.BaseFragment
 import com.nikolaykul.shortvids.presentation.utils.rv.decorations.VerticalMarginDecorator
 import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListAdapter
 import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListItem
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_video_list.*
 import kotlinx.android.synthetic.main.fragment_video_list_toolbar.*
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 private const val LOAD_MORE_THRESHOLD = 5
 
@@ -70,7 +73,13 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
     }
 
     private fun initListeners() {
-        // TODO: add reactive OnTextChangeListener for etFilterOptions
+        etFilterOptions.textChanges()
+            .skipInitialValue()
+            .debounce(200, TimeUnit.MILLISECONDS)
+            .map(CharSequence::toString)
+            .distinctUntilChanged()
+            .observeOn(AndroidSchedulers.mainThread())
+            .safeSubscribe { viewModel.onFilterChanged(it) }
 
         fab.setOnClickListener { viewModel.onAddNewVideoClicked() }
 
