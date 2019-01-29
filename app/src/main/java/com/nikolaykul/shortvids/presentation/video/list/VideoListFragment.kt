@@ -5,19 +5,23 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nikolaykul.shortvids.R
 import com.nikolaykul.shortvids.presentation.base.BaseFragment
+import com.nikolaykul.shortvids.presentation.utils.rv.decorations.VerticalMarginDecorator
 import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListAdapter
 import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListItem
-import com.nikolaykul.shortvids.presentation.utils.rv.decorations.VerticalMarginDecorator
 import kotlinx.android.synthetic.main.fragment_video_list.*
 
 class VideoListFragment : BaseFragment() {
-    private val adapter = VideoListAdapter()
-
     override val layoutId = R.layout.fragment_video_list
+
+    private val adapter = VideoListAdapter()
+    private val viewModel by viewModelDelegate<VideoListViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initList()
+
+        viewModel.sayHi()
+
         populateList()
     }
 

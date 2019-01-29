@@ -7,6 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import com.nikolaykul.shortvids.presentation.utils.vm.ViewModelDelegate
+import com.nikolaykul.shortvids.presentation.utils.vm.ViewModelFactory
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.AndroidSupportInjection
@@ -15,8 +18,8 @@ import javax.inject.Inject
 
 abstract class BaseFragment : Fragment(), HasSupportFragmentInjector {
 
-    @Inject
-    lateinit var childFragmentInjector: DispatchingAndroidInjector<Fragment>
+    @Inject lateinit var childFragmentInjector: DispatchingAndroidInjector<Fragment>
+    @Inject lateinit var factory: ViewModelFactory
 
     @get:LayoutRes
     protected abstract val layoutId: Int
@@ -33,4 +36,7 @@ abstract class BaseFragment : Fragment(), HasSupportFragmentInjector {
     ): View = inflater.inflate(layoutId, container, false)
 
     final override fun supportFragmentInjector(): AndroidInjector<Fragment> = childFragmentInjector
+
+    protected inline fun <reified T : ViewModel> Fragment.viewModelDelegate() =
+        ViewModelDelegate(this, { factory }, T::class.java)
 }
