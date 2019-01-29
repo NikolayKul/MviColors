@@ -9,7 +9,9 @@ import com.nikolaykul.shortvids.presentation.utils.inflate
 import kotlinx.android.synthetic.main.fragment_video_list_item.view.*
 import kotlin.random.Random
 
-class VideoListAdapter : RecyclerView.Adapter<VideoListAdapter.ViewHolder>() {
+class VideoListAdapter(
+    private val listener: Listener
+) : RecyclerView.Adapter<VideoListAdapter.ViewHolder>() {
     private val items: MutableList<VideoListItem> = mutableListOf()
 
     fun addItems(newItems: List<VideoListItem>) {
@@ -20,7 +22,7 @@ class VideoListAdapter : RecyclerView.Adapter<VideoListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = parent.inflate(R.layout.fragment_video_list_item, parent)
-        return ViewHolder(view)
+        return ViewHolder(view, listener)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -29,12 +31,18 @@ class VideoListAdapter : RecyclerView.Adapter<VideoListAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int = items.size
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(
+        view: View,
+        private val listener: Listener
+    ) : RecyclerView.ViewHolder(view) {
+
         fun bind(item: VideoListItem) {
             itemView.apply {
                 tvTitle.text = item.title
                 tvSubTitle.text = item.subTitle
                 videoLayer.setBackgroundColor(getRandomColor())
+
+                setOnClickListener { listener.onItemClicked(item) }
             }
         }
 
@@ -42,5 +50,9 @@ class VideoListAdapter : RecyclerView.Adapter<VideoListAdapter.ViewHolder>() {
             Random(System.currentTimeMillis()).run {
                 Color.rgb(nextInt(256), nextInt(256), nextInt(256))
             }
+    }
+
+    interface Listener {
+        fun onItemClicked(item: VideoListItem)
     }
 }

@@ -5,6 +5,7 @@ import com.nikolaykul.shortvids.domain.video.VideoItem
 import com.nikolaykul.shortvids.presentation.base.BaseViewModel
 import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListItem
 import io.reactivex.android.schedulers.AndroidSchedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class VideoListViewModel @Inject constructor(
@@ -21,6 +22,26 @@ class VideoListViewModel @Inject constructor(
                 onSuccess = ::onLoadingComplete,
                 onError = ::onLoadingError
             )
+    }
+
+    fun onFilterChanged(newFilter: String) {
+        Timber.d("onFilterChanged($newFilter)")
+    }
+
+    fun onFilterCancelled() {
+        Timber.d("onFilterCancelled")
+    }
+
+    fun onListEndReached() {
+        Timber.d("onListEndReached")
+    }
+
+    fun onVideoItemClicked(item: VideoListItem) {
+        Timber.d("onVideoItemClicked($item)")
+    }
+
+    fun onAddNewVideoClicked() {
+        Timber.d("onAddNewVideoClicked")
     }
 
     private fun onLoadingComplete(videos: List<VideoItem>) {
