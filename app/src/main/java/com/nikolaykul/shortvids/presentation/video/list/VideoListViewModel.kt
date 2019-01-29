@@ -16,6 +16,7 @@ class VideoListViewModel @Inject constructor(
     override fun onViewSubscribed() {
         getVideoUseCase.getVideo()
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { nextState { VideoListState(isLoading = true) } }
             .safeSubscribe(
                 onSuccess = ::onLoadingComplete,
                 onError = ::onLoadingError
