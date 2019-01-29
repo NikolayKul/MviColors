@@ -38,6 +38,9 @@ dependencies {
     kapt libs.dagger_compiler
     kapt libs.dagger_android_compiler
 
+    implementation libs.rx_android
+    implementation libs.rx_java
+
     testImplementation testLibs.junit
     androidTestImplementation testLibs.espresso
     androidTestImplementation testLibs.android_runner

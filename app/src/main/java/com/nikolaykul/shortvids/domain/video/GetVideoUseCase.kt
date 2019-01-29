@@ -1,12 +1,21 @@
 package com.nikolaykul.shortvids.domain.video
 
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class GetVideoUseCase @Inject constructor() {
 
-    fun getVideo(): List<VideoItem> = (0..100).map(::createDummyVideo)
+    fun getVideo(): Single<List<VideoItem>> =
+        Single.timer(1000L, TimeUnit.MILLISECONDS)
+            .map { createVideos() }
+            .subscribeOn(Schedulers.io())
 
-    private fun createDummyVideo(i: Int) =
+    private fun createVideos(): List<VideoItem> =
+        (0..100).map(::createSingleVideo)
+
+    private fun createSingleVideo(i: Int) =
         VideoItem(
             title = "Title for $i",
             subTitle = "Some lorem ipsum for the $i item",
