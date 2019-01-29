@@ -6,7 +6,12 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [ActivityInjectionModule::class])
+@Component(
+    modules = [
+        ActivityInjectionModule::class,
+        ViewModelCommonModule::class
+    ]
+)
 interface AppComponent {
 
     fun inject(app: ShortVidsApp)

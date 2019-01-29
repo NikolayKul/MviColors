@@ -7,9 +7,7 @@ import dagger.android.support.AndroidSupportInjectionModule
 
 @Module(includes = [AndroidSupportInjectionModule::class])
 interface ActivityInjectionModule {
-
     @PerActivity
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [MainActivityModule::class])
     fun mainActivity(): MainActivity
-
 }
