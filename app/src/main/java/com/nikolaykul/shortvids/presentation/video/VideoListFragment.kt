@@ -3,6 +3,7 @@ package com.nikolaykul.shortvids.presentation.video
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.rxbinding3.widget.textChanges
@@ -14,6 +15,7 @@ import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_video_list.*
 import kotlinx.android.synthetic.main.fragment_video_list_toolbar.*
+import kotlinx.android.synthetic.main.fragment_video_loader.*
 import timber.log.Timber
 
 private const val LOAD_MORE_THRESHOLD = 5
@@ -45,9 +47,7 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
 
-        state.isLoading?.let {
-            Toast.makeText(context, "IsLoading = $it", Toast.LENGTH_SHORT).show()
-        }
+        vgLoader.isVisible = state.isLoading ?: false
 
         state.allItems?.let {
             adapter.setItems(it)

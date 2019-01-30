@@ -23,4 +23,6 @@
         app:fabSize="normal"
         app:useCompatPadding="true" />
 
+    <include layout="@layout/fragment_video_loader" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
