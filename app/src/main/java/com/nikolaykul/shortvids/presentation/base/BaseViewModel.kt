@@ -14,6 +14,10 @@ abstract class BaseViewModel<TState : ViewState>(initState: TState) : ViewModel(
     private val stateRelay by lazy { BehaviorSubject.createDefault(initState) }
     private val disposables = CompositeDisposable()
 
+    override fun onCleared() {
+        disposables.clear()
+    }
+
     fun observeState(): Observable<TState> = stateRelay
         .observeOn(AndroidSchedulers.mainThread())
         .doOnSubscribe { onViewSubscribed() }
@@ -48,8 +52,4 @@ abstract class BaseViewModel<TState : ViewState>(initState: TState) : ViewModel(
     ): Disposable =
         subscribe(onNext, onError, onComplete)
             .also { disposables.add(it) }
-
-    override fun onCleared() {
-        disposables.clear()
-    }
 }

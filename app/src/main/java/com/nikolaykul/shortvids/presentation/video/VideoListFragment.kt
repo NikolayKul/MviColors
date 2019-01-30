@@ -43,18 +43,17 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
     private fun handleState(state: VideoListState) {
         Timber.d("NextState -> $state")
 
-        state.errorMsg?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-        }
-
-        vgLoader.isVisible = state.isLoading ?: false
-
-        state.allItems?.let {
-            adapter.setItems(it)
-        }
-
-        state.newBottomItems?.let {
-            adapter.addItems(it)
+        vgLoader.isVisible = state is VideoListState.Loading
+        when (state) {
+            is VideoListState.AllItems -> {
+                adapter.setItems(state.items)
+            }
+            is VideoListState.ExtraBottomItems -> {
+                adapter.addItems(state.items)
+            }
+            is VideoListState.Error -> {
+                Toast.makeText(context, state.msg, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

@@ -18,8 +18,9 @@ class VideoListViewModel @Inject constructor(
     private val getVideoUseCase: GetVideoUseCase,
     private val router: DummyRouter
 ) : BaseViewModel<VideoListState>(
-    initState = VideoListState()
+    initState = VideoListState.AllItems(emptyList())
 ) {
+
     private var filterSubject = PublishSubject.create<String>()
     private var bottomItemsDisposable: Disposable? = null
     private var currentFilter: String? = null
@@ -45,10 +46,10 @@ class VideoListViewModel @Inject constructor(
         bottomItemsDisposable = getVideoUseCase.getVideo(currentFilter)
             .map(this::mapToViewItems)
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { nextState { VideoListState(isLoading = true) } }
+            .doOnSubscribe { nextState { VideoListState.Loading } }
             .safeSubscribe(
                 onSuccess = { items ->
-                    nextState { VideoListState(newBottomItems = items) }
+                    nextState { VideoListState.ExtraBottomItems(items) }
                 },
                 onError = ::onLoadingError
             )
@@ -71,9 +72,9 @@ class VideoListViewModel @Inject constructor(
                 getVideoUseCase.getVideo(it)
                     .map(this::mapToViewItems)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnSubscribe { nextState { VideoListState(isLoading = true) } }
+                    .doOnSubscribe { nextState { VideoListState.Loading } }
                     .doOnSuccess { items ->
-                        nextState { VideoListState(allItems = items) }
+                        nextState { VideoListState.AllItems(items) }
                     }
                     .doOnError(this::onLoadingError)
                     .toObservable()
@@ -86,10 +87,10 @@ class VideoListViewModel @Inject constructor(
         getVideoUseCase.getVideo()
             .map(this::mapToViewItems)
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { nextState { VideoListState(isLoading = true) } }
+            .doOnSubscribe { nextState { VideoListState.Loading } }
             .safeSubscribe(
                 onSuccess = { items ->
-                    nextState { VideoListState(allItems = items) }
+                    nextState { VideoListState.AllItems(items) }
                 },
                 onError = ::onLoadingError
             )
@@ -99,6 +100,6 @@ class VideoListViewModel @Inject constructor(
         videos.map { VideoListItem(it.id, it.title, it.subTitle, it.videoPath) }
 
     private fun onLoadingError(t: Throwable?) {
-        nextState { VideoListState(errorMsg = t?.localizedMessage) }
+        nextState { VideoListState.Error(t?.localizedMessage) }
     }
 }
