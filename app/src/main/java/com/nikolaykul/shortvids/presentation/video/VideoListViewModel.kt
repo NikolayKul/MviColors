@@ -1,5 +1,6 @@
 package com.nikolaykul.shortvids.presentation.video
 
+import com.nikolaykul.shortvids.domain.navigation.DummyRouter
 import com.nikolaykul.shortvids.domain.video.GetVideoUseCase
 import com.nikolaykul.shortvids.domain.video.VideoItem
 import com.nikolaykul.shortvids.presentation.base.BaseViewModel
@@ -8,14 +9,14 @@ import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val FILTER_THRESHOLD_MILLIS = 200L
 
 class VideoListViewModel @Inject constructor(
-    private val getVideoUseCase: GetVideoUseCase
+    private val getVideoUseCase: GetVideoUseCase,
+    private val router: DummyRouter
 ) : BaseViewModel<VideoListState>(
     initState = VideoListState()
 ) {
@@ -54,11 +55,11 @@ class VideoListViewModel @Inject constructor(
     }
 
     fun onVideoItemClicked(item: VideoListItem) {
-        Timber.d("onVideoItemClicked($item)")
+        router.navigateToVideoDetails(item.id)
     }
 
     fun onAddNewVideoClicked() {
-        Timber.d("onAddNewVideoClicked")
+        router.navigateToAddVideo()
     }
 
     private fun observeFilter() {
@@ -95,7 +96,7 @@ class VideoListViewModel @Inject constructor(
     }
 
     private fun mapToViewItems(videos: List<VideoItem>) =
-        videos.map { VideoListItem(it.title, it.subTitle, it.videoPath) }
+        videos.map { VideoListItem(it.id, it.title, it.subTitle, it.videoPath) }
 
     private fun onLoadingError(t: Throwable?) {
         nextState { VideoListState(errorMsg = t?.localizedMessage) }
