@@ -15,7 +15,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_video_list.*
 import kotlinx.android.synthetic.main.fragment_video_list_toolbar.*
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 private const val LOAD_MORE_THRESHOLD = 5
 
@@ -51,7 +50,7 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
         }
 
         state.items?.let {
-            adapter.addItems(it)
+            adapter.setItems(it)
         }
     }
 
@@ -75,9 +74,7 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
     private fun initListeners() {
         etFilterOptions.textChanges()
             .skipInitialValue()
-            .debounce(200, TimeUnit.MILLISECONDS)
             .map(CharSequence::toString)
-            .distinctUntilChanged()
             .observeOn(AndroidSchedulers.mainThread())
             .safeSubscribe { viewModel.onFilterChanged(it) }
 

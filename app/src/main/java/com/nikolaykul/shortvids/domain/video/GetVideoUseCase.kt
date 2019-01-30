@@ -7,16 +7,20 @@ import javax.inject.Inject
 
 class GetVideoUseCase @Inject constructor() {
 
-    fun getVideo(): Single<List<VideoItem>> =
-        Single.timer(2500L, TimeUnit.MILLISECONDS)
-            .map { createVideos() }
+    fun getVideo(filter: String? = null): Single<List<VideoItem>> =
+        Single.timer(1500L, TimeUnit.MILLISECONDS)
+            .map { createVideos(filter) }
             .subscribeOn(Schedulers.io())
 
-    private fun createVideos(): List<VideoItem> =
-        (0..100).map(::createSingleVideo)
+    private fun createVideos(filter: String? = null): List<VideoItem> =
+        (0..100).asSequence()
+            .map(::createSingleVideo)
+            .filter { filter == null || filter.length >= it.id.length }
+            .toList()
 
     private fun createSingleVideo(i: Int) =
         VideoItem(
+            id = "$i",
             title = "Title for $i",
             subTitle = "Some lorem ipsum for the $i item",
             videoPath = "Actually there's no any videoPath at the moment"

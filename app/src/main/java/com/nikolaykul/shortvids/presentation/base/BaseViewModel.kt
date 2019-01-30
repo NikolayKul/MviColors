@@ -41,6 +41,14 @@ abstract class BaseViewModel<TState : ViewState>(initState: TState) : ViewModel(
         subscribe(onSuccess, onError)
             .also { disposables.add(it) }
 
+    protected fun <T> Observable<T>.safeSubscribe(
+        onComplete: () -> Unit = { /* no-op */ },
+        onError: (Throwable) -> Unit = Timber::e,
+        onNext: (T) -> Unit = { /* no-op */ }
+    ): Disposable =
+        subscribe(onNext, onError, onComplete)
+            .also { disposables.add(it) }
+
     override fun onCleared() {
         disposables.clear()
     }

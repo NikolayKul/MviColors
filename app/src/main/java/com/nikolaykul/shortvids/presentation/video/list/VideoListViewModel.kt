@@ -5,31 +5,31 @@ import com.nikolaykul.shortvids.domain.video.VideoItem
 import com.nikolaykul.shortvids.presentation.base.BaseViewModel
 import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListItem
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+private const val FILTER_THRESHOLD_MILLIS = 200L
 
 class VideoListViewModel @Inject constructor(
     private val getVideoUseCase: GetVideoUseCase
 ) : BaseViewModel<VideoListState>(
     initState = VideoListState()
 ) {
+    private var filterSubject = PublishSubject.create<String>()
 
     override fun onViewSubscribed() {
-        getVideoUseCase.getVideo()
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { nextState { VideoListState(isLoading = true) } }
-            .safeSubscribe(
-                onSuccess = ::onLoadingComplete,
-                onError = ::onLoadingError
-            )
+        loadInitVideos()
+        observeFilter()
     }
 
     fun onFilterChanged(newFilter: String) {
-        Timber.d("onFilterChanged($newFilter)")
+        filterSubject.onNext(newFilter)
     }
 
     fun onFilterCancelled() {
-        Timber.d("onFilterCancelled")
+        filterSubject.onNext("")
     }
 
     fun onListEndReached() {
@@ -42,6 +42,32 @@ class VideoListViewModel @Inject constructor(
 
     fun onAddNewVideoClicked() {
         Timber.d("onAddNewVideoClicked")
+    }
+
+    private fun observeFilter() {
+        filterSubject
+            .debounce(FILTER_THRESHOLD_MILLIS, TimeUnit.MILLISECONDS)
+            .distinctUntilChanged()
+            .switchMap {
+                getVideoUseCase.getVideo(it)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe { nextState { VideoListState(isLoading = true) } }
+                    .doOnError(this::onLoadingError)
+                    .doOnSuccess(this::onLoadingComplete)
+                    .toObservable()
+            }
+            .retry()
+            .safeSubscribe()
+    }
+
+    private fun loadInitVideos() {
+        getVideoUseCase.getVideo()
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { nextState { VideoListState(isLoading = true) } }
+            .safeSubscribe(
+                onSuccess = ::onLoadingComplete,
+                onError = ::onLoadingError
+            )
     }
 
     private fun onLoadingComplete(videos: List<VideoItem>) {

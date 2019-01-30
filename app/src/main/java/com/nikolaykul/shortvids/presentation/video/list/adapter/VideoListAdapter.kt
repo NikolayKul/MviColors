@@ -14,6 +14,12 @@ class VideoListAdapter(
 ) : RecyclerView.Adapter<VideoListAdapter.ViewHolder>() {
     private val items: MutableList<VideoListItem> = mutableListOf()
 
+    fun setItems(newItems: List<VideoListItem>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
+    }
+
     fun addItems(newItems: List<VideoListItem>) {
         val start = items.size
         items.addAll(newItems)
