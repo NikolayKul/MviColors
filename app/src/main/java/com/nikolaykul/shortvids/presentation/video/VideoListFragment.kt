@@ -88,7 +88,6 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
     }
 
     companion object {
-        fun newInstance(): VideoListFragment =
-            VideoListFragment()
+        fun newInstance(): VideoListFragment = VideoListFragment()
     }
 }
