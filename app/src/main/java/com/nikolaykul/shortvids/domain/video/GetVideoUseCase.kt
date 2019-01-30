@@ -15,7 +15,7 @@ class GetVideoUseCase @Inject constructor() {
     private fun createVideos(filter: String? = null): List<VideoItem> =
         (0..100).asSequence()
             .map(::createSingleVideo)
-            .filter { filter == null || filter.length >= it.id.length }
+            .filter { filter.isNullOrBlank() || filter.length >= it.id.length }
             .toList()
 
     private fun createSingleVideo(i: Int) =

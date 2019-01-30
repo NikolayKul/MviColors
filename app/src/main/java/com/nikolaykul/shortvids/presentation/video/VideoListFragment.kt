@@ -49,8 +49,12 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
             Toast.makeText(context, "IsLoading = $it", Toast.LENGTH_SHORT).show()
         }
 
-        state.items?.let {
+        state.allItems?.let {
             adapter.setItems(it)
+        }
+
+        state.newBottomItems?.let {
+            adapter.addItems(it)
         }
     }
 
@@ -74,13 +78,16 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
     private fun initListeners() {
         etFilterOptions.textChanges()
             .skipInitialValue()
-            .map(CharSequence::toString)
+            .map { it.trim().toString() }
             .observeOn(AndroidSchedulers.mainThread())
             .safeSubscribe { viewModel.onFilterChanged(it) }
 
         fab.setOnClickListener { viewModel.onAddNewVideoClicked() }
 
-        btnClearFilter.setOnClickListener { viewModel.onFilterCancelled() }
+        btnClearFilter.setOnClickListener {
+            etFilterOptions.text.clear()
+            viewModel.onFilterCancelled()
+        }
 
         btnApplyFilter.setOnClickListener {
             viewModel.onFilterChanged(etFilterOptions.text.toString())
