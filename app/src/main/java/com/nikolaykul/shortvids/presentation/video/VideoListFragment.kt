@@ -1,4 +1,4 @@
-package com.nikolaykul.shortvids.presentation.video.list
+package com.nikolaykul.shortvids.presentation.video
 
 import android.os.Bundle
 import android.view.View
@@ -9,8 +9,8 @@ import com.jakewharton.rxbinding3.widget.textChanges
 import com.nikolaykul.shortvids.R
 import com.nikolaykul.shortvids.presentation.base.BaseFragment
 import com.nikolaykul.shortvids.presentation.utils.rv.decorations.VerticalMarginDecorator
-import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListAdapter
-import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListItem
+import com.nikolaykul.shortvids.presentation.video.adapter.VideoListAdapter
+import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_video_list.*
 import kotlinx.android.synthetic.main.fragment_video_list_toolbar.*
@@ -88,6 +88,7 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
     }
 
     companion object {
-        fun newInstance(): VideoListFragment = VideoListFragment()
+        fun newInstance(): VideoListFragment =
+            VideoListFragment()
     }
 }

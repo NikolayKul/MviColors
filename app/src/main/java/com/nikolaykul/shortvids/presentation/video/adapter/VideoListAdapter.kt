@@ -1,4 +1,4 @@
-package com.nikolaykul.shortvids.presentation.video.list.adapter
+package com.nikolaykul.shortvids.presentation.video.adapter
 
 import android.graphics.Color
 import android.view.View

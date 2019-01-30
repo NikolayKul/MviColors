@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/activityContainer"
-    android:name="com.nikolaykul.shortvids.presentation.main.MainFragment"
+    android:name="com.nikolaykul.shortvids.presentation.video.VideoListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />

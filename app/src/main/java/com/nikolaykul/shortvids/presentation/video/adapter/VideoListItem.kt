@@ -1,4 +1,4 @@
-package com.nikolaykul.shortvids.presentation.video.list.adapter
+package com.nikolaykul.shortvids.presentation.video.adapter
 
 class VideoListItem(
     val title: String,

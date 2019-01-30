@@ -1,7 +1,7 @@
-package com.nikolaykul.shortvids.presentation.video.list
+package com.nikolaykul.shortvids.presentation.video
 
 import com.nikolaykul.shortvids.presentation.base.ViewState
-import com.nikolaykul.shortvids.presentation.video.list.adapter.VideoListItem
+import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
 
 data class VideoListState(
     val items: List<VideoListItem>? = null,
