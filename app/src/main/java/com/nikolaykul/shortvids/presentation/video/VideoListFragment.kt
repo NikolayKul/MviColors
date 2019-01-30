@@ -64,7 +64,7 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
         rvVids.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
-                if (adapter.itemCount - lastVisiblePosition < LOAD_MORE_THRESHOLD) {
+                if (dy > 0 && adapter.itemCount - lastVisiblePosition < LOAD_MORE_THRESHOLD) {
                     viewModel.onListEndReached()
                 }
             }
