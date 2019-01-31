@@ -20,14 +20,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     implementation libs.kotlin_jdk
     implementation libs.androidx_appcompat
     implementation libs.ktx_core
-    implementation libs.view_model
-    implementation libs.view_model_ext
+    implementation libs.lifecycle_runtime
+    implementation libs.lifecycle_common
     implementation libs.constraint_layout
     implementation libs.material
     implementation libs.timber
@@ -42,6 +46,9 @@ dependencies {
     implementation libs.rx_android
     implementation libs.rx_java
     implementation libs.rx_binding
+
+    implementation libs.mvicore
+    implementation libs.mvicore_android
 
     testImplementation testLibs.junit
     androidTestImplementation testLibs.espresso

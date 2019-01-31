@@ -1,7 +1,6 @@
 package com.nikolaykul.shortvids.di.activity
 
 import com.nikolaykul.shortvids.di.fragment.PerFragment
-import com.nikolaykul.shortvids.di.fragment.VideoListFragmentModule
 import com.nikolaykul.shortvids.presentation.video.VideoListFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -10,7 +9,7 @@ import dagger.android.ContributesAndroidInjector
 interface MainActivityModule {
 
     @PerFragment
-    @ContributesAndroidInjector(modules = [VideoListFragmentModule::class])
+    @ContributesAndroidInjector
     fun videoListFragment(): VideoListFragment
 
 }

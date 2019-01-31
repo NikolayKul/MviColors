@@ -10,13 +10,15 @@ import com.jakewharton.rxbinding3.widget.textChanges
 import com.nikolaykul.shortvids.R
 import com.nikolaykul.shortvids.presentation.base.BaseFragment
 import com.nikolaykul.shortvids.presentation.utils.rv.decorations.VerticalMarginDecorator
+import com.nikolaykul.shortvids.presentation.video.VideoListFeature.*
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListAdapter
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_video_list.*
 import kotlinx.android.synthetic.main.fragment_video_list_toolbar.*
 import kotlinx.android.synthetic.main.fragment_video_loader.*
-import timber.log.Timber
+import javax.inject.Inject
 
 private const val LOAD_MORE_THRESHOLD = 5
 
@@ -24,36 +26,30 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
 
     override val layoutId = R.layout.fragment_video_list
 
+    @Inject lateinit var feature: VideoListFeature
     private lateinit var adapter: VideoListAdapter
-    private val viewModel by viewModelDelegate<VideoListViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initList()
         initListeners()
 
-        viewModel.observeState()
-            .safeSubscribe { handleState(it) }
+        binder.bind(feature to stateConsumer())
+        binder.bind(feature.news to newsConsumer())
     }
 
     override fun onItemClicked(item: VideoListItem) {
-        viewModel.onVideoItemClicked(item)
+        feature.accept(Wish.VideoItemClicked(item))
     }
 
-    private fun handleState(state: VideoListState) {
-        Timber.d("NextState -> $state")
+    private fun stateConsumer() = Consumer<State> { state ->
+        vgLoader.isVisible = state.isLoading
+        state.allItems?.let { adapter.setItems(it) }
+    }
 
-        vgLoader.isVisible = state is VideoListState.Loading
-        when (state) {
-            is VideoListState.AllItems -> {
-                adapter.setItems(state.items)
-            }
-            is VideoListState.ExtraBottomItems -> {
-                adapter.addItems(state.items)
-            }
-            is VideoListState.Error -> {
-                Toast.makeText(context, state.msg, Toast.LENGTH_SHORT).show()
-            }
+    private fun newsConsumer() = Consumer<News> { news ->
+        when (news) {
+            is News.Error -> Toast.makeText(context, news.msg, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -68,7 +64,7 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
                 if (dy > 0 && adapter.itemCount - lastVisiblePosition < LOAD_MORE_THRESHOLD) {
-                    viewModel.onListEndReached()
+                    feature.accept(Wish.ListEndReached)
                 }
             }
         })
@@ -78,18 +74,20 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
         etFilterOptions.textChanges()
             .skipInitialValue()
             .map { it.trim().toString() }
+            .map { Wish.ChangeFilter(it) as Wish }
             .observeOn(AndroidSchedulers.mainThread())
-            .safeSubscribe { viewModel.onFilterChanged(it) }
+            .safeSubscribe(feature)
 
-        fab.setOnClickListener { viewModel.onAddNewVideoClicked() }
+        fab.setOnClickListener { feature.accept(Wish.AddNewVideoClicked) }
 
         btnClearFilter.setOnClickListener {
             etFilterOptions.text.clear()
-            viewModel.onFilterCancelled()
+            feature.accept(Wish.CancelFilter)
         }
 
         btnApplyFilter.setOnClickListener {
-            viewModel.onFilterChanged(etFilterOptions.text.toString())
+            val filter = etFilterOptions.text.toString()
+            feature.accept(Wish.ChangeFilter(filter))
         }
     }
 

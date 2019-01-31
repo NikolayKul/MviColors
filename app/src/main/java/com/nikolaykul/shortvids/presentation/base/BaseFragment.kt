@@ -7,9 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import com.nikolaykul.shortvids.presentation.utils.vm.ViewModelDelegate
-import com.nikolaykul.shortvids.presentation.utils.vm.ViewModelFactory
+import com.badoo.mvicore.android.lifecycle.CreateDestroyBinderLifecycle
+import com.badoo.mvicore.binder.Binder
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.AndroidSupportInjection
@@ -17,13 +16,14 @@ import dagger.android.support.HasSupportFragmentInjector
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import timber.log.Timber
 import javax.inject.Inject
 
 abstract class BaseFragment : Fragment(), HasSupportFragmentInjector {
 
     @Inject lateinit var childFragmentInjector: DispatchingAndroidInjector<Fragment>
-    @Inject lateinit var factory: ViewModelFactory
+    protected val binder: Binder by lazy { Binder(CreateDestroyBinderLifecycle(lifecycle)) }
     private val disposables = CompositeDisposable()
 
     @get:LayoutRes
@@ -47,14 +47,8 @@ abstract class BaseFragment : Fragment(), HasSupportFragmentInjector {
 
     final override fun supportFragmentInjector(): AndroidInjector<Fragment> = childFragmentInjector
 
-    protected inline fun <reified T : ViewModel> Fragment.viewModelDelegate() =
-        ViewModelDelegate(this, { factory }, T::class.java)
 
-    protected fun <T> Observable<T>.safeSubscribe(
-        onComplete: () -> Unit = { /* no-op */ },
-        onError: (Throwable) -> Unit = Timber::e,
-        onNext: (T) -> Unit
-    ): Disposable =
-        subscribe(onNext, onError, onComplete)
+    protected fun <T> Observable<T>.safeSubscribe(onNext: Consumer<T>): Disposable =
+        subscribe(onNext, Consumer { Timber.e(it) })
             .also { disposables.add(it) }
 }

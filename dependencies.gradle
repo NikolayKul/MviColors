@@ -12,7 +12,8 @@ ext.versions = [
         timber            : '4.7.1',
         dagger            : '2.20',
         rx                : '2.1.0',
-        rx_binding        : '3.0.0-alpha2'
+        rx_binding        : '3.0.0-alpha2',
+        mvicore           : '1.1.4'
 ]
 
 ext.testVersions = [
@@ -25,8 +26,8 @@ ext.libs = [
         kotlin_jdk             : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin",
         androidx_appcompat     : "androidx.appcompat:appcompat:$versions.androidx_appcompat",
         ktx_core               : "androidx.core:core-ktx:$versions.ktx_core",
-        view_model             : "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycle",
-        view_model_ext         : "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle",
+        lifecycle_runtime      : "androidx.lifecycle:lifecycle-runtime:$versions.lifecycle",
+        lifecycle_common       : "androidx.lifecycle:lifecycle-common-java8:$versions.lifecycle",
         constraint_layout      : "androidx.constraintlayout:constraintlayout:$versions.constraint_layout",
         material               : "com.google.android.material:material:$versions.material",
         timber                 : "com.jakewharton.timber:timber:$versions.timber",
@@ -39,7 +40,10 @@ ext.libs = [
 
         rx_android             : "io.reactivex.rxjava2:rxandroid:$versions.rx",
         rx_java                : "io.reactivex.rxjava2:rxjava:$versions.rx",
-        rx_binding             : "com.jakewharton.rxbinding3:rxbinding-core:$versions.rx_binding"
+        rx_binding             : "com.jakewharton.rxbinding3:rxbinding-core:$versions.rx_binding",
+
+        mvicore                : "com.github.badoo.mvicore:mvicore:$versions.mvicore",
+        mvicore_android        : "com.github.badoo.mvicore:mvicore-android:$versions.mvicore"
 ]
 
 ext.testLibs = [
