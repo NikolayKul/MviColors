@@ -14,7 +14,6 @@ import com.nikolaykul.shortvids.presentation.video.VideoListFeature.*
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListAdapter
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_video_list.*
 import kotlinx.android.synthetic.main.fragment_video_list_toolbar.*
 import kotlinx.android.synthetic.main.fragment_video_loader.*
@@ -22,11 +21,11 @@ import javax.inject.Inject
 
 private const val LOAD_MORE_THRESHOLD = 5
 
-class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
+class VideoListFragment : BaseFragment<State, Wish, News>(), VideoListAdapter.Listener {
 
     override val layoutId = R.layout.fragment_video_list
 
-    @Inject lateinit var feature: VideoListFeature
+    @Inject lateinit var binding: VideoListBinding
     private lateinit var adapter: VideoListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,23 +33,22 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
         initList()
         initListeners()
 
-        binder.bind(feature to stateConsumer())
-        binder.bind(feature.news to newsConsumer())
+        binding.setup(this)
     }
 
-    override fun onItemClicked(item: VideoListItem) {
-        feature.accept(Wish.VideoItemClicked(item))
-    }
-
-    private fun stateConsumer() = Consumer<State> { state ->
+    override fun consumeState(state: State) {
         vgLoader.isVisible = state.isLoading
         state.allItems?.let { adapter.setItems(it) }
     }
 
-    private fun newsConsumer() = Consumer<News> { news ->
+    override fun consumeNews(news: News) {
         when (news) {
             is News.Error -> Toast.makeText(context, news.msg, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun onItemClicked(item: VideoListItem) {
+        wishProvider.onNext(Wish.VideoItemClicked(item))
     }
 
     private fun initList() {
@@ -64,7 +62,7 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
                 if (dy > 0 && adapter.itemCount - lastVisiblePosition < LOAD_MORE_THRESHOLD) {
-                    feature.accept(Wish.ListEndReached)
+                    wishProvider.onNext(Wish.ListEndReached)
                 }
             }
         })
@@ -76,18 +74,18 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
             .map { it.trim().toString() }
             .map { Wish.ChangeFilter(it) as Wish }
             .observeOn(AndroidSchedulers.mainThread())
-            .safeSubscribe(feature)
+            .safeSubscribe(wishProvider)
 
-        fab.setOnClickListener { feature.accept(Wish.AddNewVideoClicked) }
+        fab.setOnClickListener { wishProvider.onNext(Wish.AddNewVideoClicked) }
 
         btnClearFilter.setOnClickListener {
             etFilterOptions.text.clear()
-            feature.accept(Wish.CancelFilter)
+            wishProvider.onNext(Wish.CancelFilter)
         }
 
         btnApplyFilter.setOnClickListener {
             val filter = etFilterOptions.text.toString()
-            feature.accept(Wish.ChangeFilter(filter))
+            wishProvider.onNext(Wish.ChangeFilter(filter))
         }
     }
 

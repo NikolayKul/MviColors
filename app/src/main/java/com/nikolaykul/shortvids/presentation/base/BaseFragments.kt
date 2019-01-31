@@ -7,8 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
-import com.badoo.mvicore.android.lifecycle.CreateDestroyBinderLifecycle
-import com.badoo.mvicore.binder.Binder
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.AndroidSupportInjection
@@ -17,13 +15,14 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
+import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
 import javax.inject.Inject
 
-abstract class BaseFragment : Fragment(), HasSupportFragmentInjector {
+abstract class BaseFragment<State, Wish, News> : MviFragment<State, Wish, News>(),
+    HasSupportFragmentInjector {
 
     @Inject lateinit var childFragmentInjector: DispatchingAndroidInjector<Fragment>
-    protected val binder: Binder by lazy { Binder(CreateDestroyBinderLifecycle(lifecycle)) }
     private val disposables = CompositeDisposable()
 
     @get:LayoutRes
@@ -47,8 +46,20 @@ abstract class BaseFragment : Fragment(), HasSupportFragmentInjector {
 
     final override fun supportFragmentInjector(): AndroidInjector<Fragment> = childFragmentInjector
 
-
     protected fun <T> Observable<T>.safeSubscribe(onNext: Consumer<T>): Disposable =
         subscribe(onNext, Consumer { Timber.e(it) })
             .also { disposables.add(it) }
+}
+
+
+abstract class MviFragment<State, Wish, News> : Fragment() {
+    val stateConsumer = Consumer<State> { consumeState(it) }
+    val newsConsumer = Consumer<News> { consumeNews(it) }
+    val wishProvider = PublishSubject.create<Wish>()
+
+    protected abstract fun consumeState(state: State)
+
+    protected open fun consumeNews(news: News) {
+        /* no-op */
+    }
 }
