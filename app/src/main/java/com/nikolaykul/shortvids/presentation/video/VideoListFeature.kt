@@ -37,11 +37,11 @@ class VideoListFeature @Inject constructor(
     }
 
     sealed class Wish {
-        class ChangeFilter(val filter: String? = null) : Wish()
-        object CancelFilter : Wish()
-        object ListEndReached : Wish()
-        class VideoItemClicked(val item: VideoListItem) : Wish()
-        object AddNewVideoClicked : Wish()
+        class LoadVideo(val filter: String? = null) : Wish()
+        object ClearVideoFilter : Wish()
+        object LoadMoreVideo : Wish()
+        class NavigateToDetails(val item: VideoListItem) : Wish()
+        object NavigateToAddNewVideo : Wish()
     }
 
     sealed class Effect {
@@ -74,26 +74,26 @@ private class ActorImpl(
     }
 
     private fun executeWish(state: State, wish: Wish): Observable<out Effect> = when (wish) {
-        is Wish.ChangeFilter -> {
+        is Wish.LoadVideo -> {
             if (state.isLoading) {
                 Observable.empty()
             } else {
                 loadVideos(wish.filter)
             }
         }
-        is Wish.CancelFilter -> loadVideos(null)
-        is Wish.ListEndReached -> {
+        is Wish.ClearVideoFilter -> loadVideos(null)
+        is Wish.LoadMoreVideo -> {
             if (state.isLoading) {
                 Observable.empty()
             } else {
                 loadVideos(state.currentFilter)
             }
         }
-        is Wish.VideoItemClicked -> {
+        is Wish.NavigateToDetails -> {
             router.navigateToVideoDetails(wish.item.id)
             Observable.empty()
         }
-        is Wish.AddNewVideoClicked -> {
+        is Wish.NavigateToAddNewVideo -> {
             router.navigateToAddVideo()
             Observable.empty()
         }

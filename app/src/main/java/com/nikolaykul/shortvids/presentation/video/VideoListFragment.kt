@@ -10,9 +10,12 @@ import com.jakewharton.rxbinding3.widget.textChanges
 import com.nikolaykul.shortvids.R
 import com.nikolaykul.shortvids.presentation.base.BaseFragment
 import com.nikolaykul.shortvids.presentation.utils.rv.decorations.VerticalMarginDecorator
-import com.nikolaykul.shortvids.presentation.video.VideoListFeature.*
+import com.nikolaykul.shortvids.presentation.video.VideoListFeature.News
+import com.nikolaykul.shortvids.presentation.video.VideoListFeature.State
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListAdapter
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
+import com.nikolaykul.shortvids.presentation.video.binding.VideoListBinding
+import com.nikolaykul.shortvids.presentation.video.binding.VideoListUiEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_video_list.*
 import kotlinx.android.synthetic.main.fragment_video_list_toolbar.*
@@ -21,7 +24,7 @@ import javax.inject.Inject
 
 private const val LOAD_MORE_THRESHOLD = 5
 
-class VideoListFragment : BaseFragment<State, Wish, News>(), VideoListAdapter.Listener {
+class VideoListFragment : BaseFragment<State, VideoListUiEvent, News>(), VideoListAdapter.Listener {
 
     override val layoutId = R.layout.fragment_video_list
 
@@ -48,7 +51,7 @@ class VideoListFragment : BaseFragment<State, Wish, News>(), VideoListAdapter.Li
     }
 
     override fun onItemClicked(item: VideoListItem) {
-        wishProvider.onNext(Wish.VideoItemClicked(item))
+        uiEvents.onNext(VideoListUiEvent.OnVideoItemClicked(item))
     }
 
     private fun initList() {
@@ -62,7 +65,7 @@ class VideoListFragment : BaseFragment<State, Wish, News>(), VideoListAdapter.Li
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
                 if (dy > 0 && adapter.itemCount - lastVisiblePosition < LOAD_MORE_THRESHOLD) {
-                    wishProvider.onNext(Wish.ListEndReached)
+                    uiEvents.onNext(VideoListUiEvent.OnListEndReached)
                 }
             }
         })
@@ -72,20 +75,20 @@ class VideoListFragment : BaseFragment<State, Wish, News>(), VideoListAdapter.Li
         etFilterOptions.textChanges()
             .skipInitialValue()
             .map { it.trim().toString() }
-            .map { Wish.ChangeFilter(it) as Wish }
+            .map { VideoListUiEvent.OnFilterChanged(it) as VideoListUiEvent }
             .observeOn(AndroidSchedulers.mainThread())
-            .safeSubscribe(wishProvider)
+            .safeSubscribe(uiEvents)
 
-        fab.setOnClickListener { wishProvider.onNext(Wish.AddNewVideoClicked) }
+        fab.setOnClickListener { uiEvents.onNext(VideoListUiEvent.OnAddNewVideoClicked) }
 
         btnClearFilter.setOnClickListener {
             etFilterOptions.text.clear()
-            wishProvider.onNext(Wish.CancelFilter)
+            uiEvents.onNext(VideoListUiEvent.OnFilterCanceled)
         }
 
         btnApplyFilter.setOnClickListener {
             val filter = etFilterOptions.text.toString()
-            wishProvider.onNext(Wish.ChangeFilter(filter))
+            uiEvents.onNext(VideoListUiEvent.OnFilterChanged(filter))
         }
     }
 

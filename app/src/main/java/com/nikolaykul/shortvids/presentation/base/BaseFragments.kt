@@ -19,7 +19,7 @@ import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
 import javax.inject.Inject
 
-abstract class BaseFragment<State, Wish, News> : MviFragment<State, Wish, News>(),
+abstract class BaseFragment<State, UiEvent, News> : MviFragment<State, UiEvent, News>(),
     HasSupportFragmentInjector {
 
     @Inject lateinit var childFragmentInjector: DispatchingAndroidInjector<Fragment>
@@ -52,10 +52,10 @@ abstract class BaseFragment<State, Wish, News> : MviFragment<State, Wish, News>(
 }
 
 
-abstract class MviFragment<State, Wish, News> : Fragment() {
+abstract class MviFragment<State, UiEvent, News> : Fragment() {
     val stateConsumer = Consumer<State> { consumeState(it) }
     val newsConsumer = Consumer<News> { consumeNews(it) }
-    val wishProvider = PublishSubject.create<Wish>()
+    val uiEvents = PublishSubject.create<UiEvent>()
 
     protected abstract fun consumeState(state: State)
 
