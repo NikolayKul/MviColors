@@ -11,11 +11,11 @@ import com.nikolaykul.shortvids.R
 import com.nikolaykul.shortvids.presentation.base.BaseFragment
 import com.nikolaykul.shortvids.presentation.utils.rv.decorations.VerticalMarginDecorator
 import com.nikolaykul.shortvids.presentation.video.VideoListFeature.News
-import com.nikolaykul.shortvids.presentation.video.VideoListFeature.State
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListAdapter
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
 import com.nikolaykul.shortvids.presentation.video.binding.VideoListBinding
 import com.nikolaykul.shortvids.presentation.video.binding.VideoListUiEvent
+import com.nikolaykul.shortvids.presentation.video.binding.VideoListViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_video_list.*
 import kotlinx.android.synthetic.main.fragment_video_list_toolbar.*
@@ -24,7 +24,8 @@ import javax.inject.Inject
 
 private const val LOAD_MORE_THRESHOLD = 5
 
-class VideoListFragment : BaseFragment<State, VideoListUiEvent, News>(), VideoListAdapter.Listener {
+class VideoListFragment : BaseFragment<VideoListViewModel, VideoListUiEvent, News>(),
+    VideoListAdapter.Listener {
 
     override val layoutId = R.layout.fragment_video_list
 
@@ -39,9 +40,9 @@ class VideoListFragment : BaseFragment<State, VideoListUiEvent, News>(), VideoLi
         binding.setup(this)
     }
 
-    override fun consumeState(state: State) {
-        vgLoader.isVisible = state.isLoading
-        state.allItems?.let { adapter.setItems(it) }
+    override fun consumeViewModel(vm: VideoListViewModel) {
+        vgLoader.isVisible = vm.isLoading
+        vm.items?.let { adapter.setItems(it) }
     }
 
     override fun consumeNews(news: News) {
