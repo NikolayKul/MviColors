@@ -33,7 +33,7 @@ class VideoListFeature @Inject constructor(
 
     sealed class Action {
         class WishWrapper(val wish: Wish) : Action()
-        object InitLoading : Action()
+        object LoadInitVideo : Action()
     }
 
     sealed class Wish {
@@ -58,7 +58,7 @@ class VideoListFeature @Inject constructor(
 
 private class BootstrapperImpl : Bootstrapper<Action> {
     override fun invoke(): Observable<Action> =
-        Observable.just(Action.InitLoading as Action)
+        Observable.just(Action.LoadInitVideo as Action)
             .observeOn(AndroidSchedulers.mainThread())
 }
 
@@ -70,7 +70,7 @@ private class ActorImpl(
 
     override fun invoke(state: State, action: Action): Observable<out Effect> = when (action) {
         is Action.WishWrapper -> executeWish(state, action.wish)
-        is Action.InitLoading -> loadVideos(null)
+        is Action.LoadInitVideo -> loadVideos(null)
     }
 
     private fun executeWish(state: State, wish: Wish): Observable<out Effect> = when (wish) {
