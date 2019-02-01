@@ -2,6 +2,10 @@ package com.nikolaykul.shortvids
 
 import android.app.Activity
 import android.app.Application
+import com.badoo.mvicore.consumer.middleware.LoggingMiddleware
+import com.badoo.mvicore.consumer.middlewareconfig.MiddlewareConfiguration
+import com.badoo.mvicore.consumer.middlewareconfig.Middlewares
+import com.badoo.mvicore.consumer.middlewareconfig.WrappingCondition
 import com.nikolaykul.shortvids.di.application.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -19,6 +23,7 @@ class ShortVidsApp : Application(), HasActivityInjector {
         super.onCreate()
         initTimber()
         initDagger()
+        initMiddleware()
         RxJavaPlugins.setErrorHandler { Timber.e(it) }
     }
 
@@ -31,5 +36,16 @@ class ShortVidsApp : Application(), HasActivityInjector {
 
     private fun initDagger() {
         DaggerAppComponent.create().inject(this)
+    }
+
+    private fun initMiddleware() {
+        Middlewares.configurations.add(
+            MiddlewareConfiguration(
+                condition = WrappingCondition.Always,
+                factories = listOf(
+                    { consumer -> LoggingMiddleware(consumer, { Timber.i(it) }) }
+                )
+            )
+        )
     }
 }
