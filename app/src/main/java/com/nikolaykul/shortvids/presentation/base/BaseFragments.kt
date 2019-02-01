@@ -11,19 +11,14 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.AndroidSupportInjection
 import dagger.android.support.HasSupportFragmentInjector
-import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.subjects.PublishSubject
-import timber.log.Timber
 import javax.inject.Inject
 
 abstract class BaseFragment<ViewModel, UiEvent, News> : MviFragment<ViewModel, UiEvent, News>(),
     HasSupportFragmentInjector {
 
     @Inject lateinit var childFragmentInjector: DispatchingAndroidInjector<Fragment>
-    private val disposables = CompositeDisposable()
 
     @get:LayoutRes
     protected abstract val layoutId: Int
@@ -39,16 +34,7 @@ abstract class BaseFragment<ViewModel, UiEvent, News> : MviFragment<ViewModel, U
         savedInstanceState: Bundle?
     ): View = inflater.inflate(layoutId, container, false)
 
-    override fun onDestroyView() {
-        disposables.clear()
-        super.onDestroyView()
-    }
-
     final override fun supportFragmentInjector(): AndroidInjector<Fragment> = childFragmentInjector
-
-    protected fun <T> Observable<T>.safeSubscribe(onNext: Consumer<T>): Disposable =
-        subscribe(onNext, Consumer { Timber.e(it) })
-            .also { disposables.add(it) }
 }
 
 

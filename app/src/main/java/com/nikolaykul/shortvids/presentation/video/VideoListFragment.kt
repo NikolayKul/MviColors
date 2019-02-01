@@ -78,7 +78,7 @@ class VideoListFragment : BaseFragment<VideoListViewModel, VideoListUiEvent, New
             .map { it.trim().toString() }
             .map { VideoListUiEvent.OnFilterChanged(it) as VideoListUiEvent }
             .observeOn(AndroidSchedulers.mainThread())
-            .safeSubscribe(uiEvents)
+            .subscribe(uiEvents)
 
         fab.setOnClickListener { uiEvents.onNext(VideoListUiEvent.OnAddNewVideoClicked) }
 
