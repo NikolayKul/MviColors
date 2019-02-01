@@ -6,6 +6,7 @@ import com.nikolaykul.shortvids.di.application.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
+import io.reactivex.plugins.RxJavaPlugins
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -18,6 +19,7 @@ class ShortVidsApp : Application(), HasActivityInjector {
         super.onCreate()
         initTimber()
         initDagger()
+        RxJavaPlugins.setErrorHandler { Timber.e(it) }
     }
 
     override fun activityInjector(): AndroidInjector<Activity> = activityInjector
