@@ -76,7 +76,6 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
 
     private fun initListeners() {
         etFilterOptions.textChanges()
-            .skipInitialValue()
             .map { it.trim().toString() }
             .observeOn(AndroidSchedulers.mainThread())
             .safeSubscribe { viewModel.onFilterChanged(it) }
