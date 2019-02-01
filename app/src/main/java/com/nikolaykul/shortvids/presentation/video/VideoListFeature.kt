@@ -12,6 +12,8 @@ import com.nikolaykul.shortvids.presentation.video.VideoListFeature.*
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.subjects.PublishSubject
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class VideoListFeature @Inject constructor(
@@ -32,15 +34,15 @@ class VideoListFeature @Inject constructor(
     )
 
     sealed class Action {
-        class WishWrapper(val wish: Wish) : Action()
+        data class WishWrapper(val wish: Wish) : Action()
         object LoadInitVideo : Action()
     }
 
     sealed class Wish {
-        class LoadVideo(val filter: String? = null) : Wish()
+        data class LoadVideo(val filter: String? = null) : Wish()
         object ClearVideoFilter : Wish()
         object LoadMoreVideo : Wish()
-        class NavigateToDetails(val item: VideoListItem) : Wish()
+        data class NavigateToDetails(val item: VideoListItem) : Wish()
         object NavigateToAddNewVideo : Wish()
     }
 
@@ -67,6 +69,7 @@ private class ActorImpl(
     private val getVideoUseCase: GetVideoUseCase,
     private val router: DummyRouter
 ) : Actor<State, Action, Effect> {
+    private val filterLoaderExecutor = FilterLoaderExecutor()
 
     override fun invoke(state: State, action: Action): Observable<out Effect> = when (action) {
         is Action.WishWrapper -> executeWish(state, action.wish)
@@ -74,13 +77,7 @@ private class ActorImpl(
     }
 
     private fun executeWish(state: State, wish: Wish): Observable<out Effect> = when (wish) {
-        is Wish.LoadVideo -> {
-            if (state.isLoading) {
-                Observable.empty()
-            } else {
-                loadVideos(wish.filter)
-            }
-        }
+        is Wish.LoadVideo -> filterLoaderExecutor.execute(wish)
         is Wish.ClearVideoFilter -> loadVideos(null)
         is Wish.LoadMoreVideo -> {
             if (state.isLoading) {
@@ -118,6 +115,24 @@ private class ActorImpl(
 
     private fun mapToViewItems(videos: List<VideoItem>) =
         videos.map { VideoListItem(it.id, it.title, it.subTitle, it.videoPath) }
+
+    private inner class FilterLoaderExecutor {
+        private val wishObserver = PublishSubject.create<Wish.LoadVideo>()
+        private val loadVideoObservable: Observable<Effect> = wishObserver
+            .debounce(FILTER_THRESHOLD_MILLIS, TimeUnit.MILLISECONDS)
+            .distinctUntilChanged()
+            .switchMap { loadVideos(it.filter) }
+            .observeOn(AndroidSchedulers.mainThread())
+
+        fun execute(wish: Wish.LoadVideo): Observable<Effect> {
+            wishObserver.onNext(wish)
+            return loadVideoObservable
+        }
+    }
+
+    companion object {
+        private const val FILTER_THRESHOLD_MILLIS = 200L
+    }
 }
 
 
