@@ -1,5 +1,6 @@
 package com.nikolaykul.mvicolors.presentation.color.list
 
+import android.graphics.Color
 import com.nikolaykul.mvicolors.domain.color.ColorItem
 import com.nikolaykul.mvicolors.domain.color.GetColorsUseCase
 import com.nikolaykul.mvicolors.domain.navigation.DummyRouter
@@ -11,6 +12,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.random.Random
 
 private const val FILTER_THRESHOLD_MILLIS = 200L
 
@@ -97,7 +99,12 @@ class ColorListViewModel @Inject constructor(
     }
 
     private fun mapToViewItems(colors: List<ColorItem>) =
-        colors.map { ColorListItem(it.id, it.title, it.subTitle, it.videoPath) }
+        colors.map {
+            val color = Random(it.id).run {
+                Color.rgb(nextInt(256), nextInt(256), nextInt(256))
+            }
+            ColorListItem(it.id, it.title, it.subTitle, color)
+        }
 
     private fun onLoadingError(t: Throwable?) {
         nextState { ColorListState.Error(t?.localizedMessage) }
