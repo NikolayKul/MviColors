@@ -18,6 +18,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_video_list.*
 import kotlinx.android.synthetic.main.fragment_video_list_toolbar.*
 import kotlinx.android.synthetic.main.fragment_video_loader.*
+import javax.inject.Inject
 
 private const val LOAD_MORE_THRESHOLD = 5
 
@@ -25,15 +26,16 @@ class VideoListFragment : BaseFragment<State>(), VideoListAdapter.Listener {
 
     override val layoutId = R.layout.fragment_video_list
 
+    @Inject lateinit var stateMachine: VideoListStateMachine
     private lateinit var adapter: VideoListAdapter
-    private val viewModel by viewModelDelegate<VideoListViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initList()
         initListeners()
 
-        viewModel.state
+        stateMachine.state
+            .observeOn(AndroidSchedulers.mainThread())
             .safeSubscribe { render(it) }
     }
 
@@ -44,7 +46,7 @@ class VideoListFragment : BaseFragment<State>(), VideoListAdapter.Listener {
     }
 
     override fun onItemClicked(item: VideoListItem) {
-        viewModel.actions.onNext(Action.NavigateToDetails(item))
+        stateMachine.input.onNext(Action.NavigateToDetails(item))
     }
 
     private fun initList() {
@@ -58,7 +60,7 @@ class VideoListFragment : BaseFragment<State>(), VideoListAdapter.Listener {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
                 if (dy > 0 && adapter.itemCount - lastVisiblePosition < LOAD_MORE_THRESHOLD) {
-                    viewModel.actions.onNext(Action.LoadMoreVideo)
+                    stateMachine.input.onNext(Action.LoadMoreVideo)
                 }
             }
         })
@@ -69,18 +71,18 @@ class VideoListFragment : BaseFragment<State>(), VideoListAdapter.Listener {
             .map { it.trim().toString() }
             .map { Action.LoadVideo(it) }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(viewModel.actions)
+            .subscribe(stateMachine.input)
 
-        fab.setOnClickListener { viewModel.actions.onNext(Action.NavigateToAddNewVideo) }
+        fab.setOnClickListener { stateMachine.input.onNext(Action.NavigateToAddNewVideo) }
 
         btnClearFilter.setOnClickListener {
             etFilterOptions.text.clear()
-            viewModel.actions.onNext(Action.ClearVideoFilter)
+            stateMachine.input.onNext(Action.ClearVideoFilter)
         }
 
         btnApplyFilter.setOnClickListener {
             val filter = etFilterOptions.text.toString()
-            viewModel.actions.onNext(Action.LoadVideo(filter))
+            stateMachine.input.onNext(Action.LoadVideo(filter))
         }
     }
 
