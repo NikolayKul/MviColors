@@ -1,5 +1,6 @@
 package com.nikolaykul.mvicolors.presentation.color.list
 
+import android.graphics.Color
 import com.badoo.mvicore.element.Actor
 import com.badoo.mvicore.element.Bootstrapper
 import com.badoo.mvicore.element.NewsPublisher
@@ -17,6 +18,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.random.Random
 
 class ColorListFeature @Inject constructor(
     getColorsUseCase: GetColorsUseCase,
@@ -110,9 +112,13 @@ private class ActorImpl(
             .startWith(Effect.Loading)
             .onErrorReturn { Effect.Error(it.localizedMessage) }
 
-    // TODO: color
     private fun mapToViewItems(colors: List<ColorItem>) =
-        colors.map { ColorListItem(it.id, it.title, it.subTitle, it.videoPath) }
+        colors.map {
+            val color = Random(it.id).run {
+                Color.rgb(nextInt(256), nextInt(256), nextInt(256))
+            }
+            ColorListItem(it.id, it.title, it.subTitle, color)
+        }
 
     private inner class FilterLoaderExecutor {
         private val wishObserver: Relay<Wish.LoadColors> = PublishRelay.create()

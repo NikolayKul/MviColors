@@ -8,7 +8,7 @@ class DummyRouter @Inject constructor() {
         Timber.d("navigateToAddColor")
     }
 
-    fun navigateToColorDetails(colorId: String) {
+    fun navigateToColorDetails(colorId: Long) {
         Timber.d("navigateToColorDetails(colorId=$colorId)")
     }
 }

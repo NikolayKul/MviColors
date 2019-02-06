@@ -1,8 +1,8 @@
 package com.nikolaykul.mvicolors.presentation.color.list.adapter
 
 class ColorListItem(
-    val id: String,
+    val id: Long,
     val title: String,
     val subTitle: String,
-    val videoPath: String
+    val color: Int
 )

@@ -9,13 +9,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.rxbinding3.widget.textChanges
 import com.nikolaykul.mvicolors.R
 import com.nikolaykul.mvicolors.presentation.base.BaseFragment
-import com.nikolaykul.mvicolors.presentation.utils.rv.decorations.VerticalMarginDecorator
 import com.nikolaykul.mvicolors.presentation.color.list.ColorListFeature.News
 import com.nikolaykul.mvicolors.presentation.color.list.adapter.ColorListAdapter
 import com.nikolaykul.mvicolors.presentation.color.list.adapter.ColorListItem
 import com.nikolaykul.mvicolors.presentation.color.list.binding.ColorListBinding
 import com.nikolaykul.mvicolors.presentation.color.list.binding.ColorListUiEvent
 import com.nikolaykul.mvicolors.presentation.color.list.binding.ColorListViewModel
+import com.nikolaykul.mvicolors.presentation.utils.rv.decorations.VerticalMarginDecorator
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_color_list.*
 import kotlinx.android.synthetic.main.fragment_color_list_toolbar.*

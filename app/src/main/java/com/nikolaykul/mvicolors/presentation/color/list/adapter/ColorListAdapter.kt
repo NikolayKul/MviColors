@@ -1,13 +1,11 @@
 package com.nikolaykul.mvicolors.presentation.color.list.adapter
 
-import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.nikolaykul.mvicolors.R
 import com.nikolaykul.mvicolors.presentation.utils.inflate
 import kotlinx.android.synthetic.main.fragment_color_list_item.view.*
-import kotlin.random.Random
 
 class ColorListAdapter(
     private val listener: Listener
@@ -40,16 +38,11 @@ class ColorListAdapter(
             itemView.apply {
                 tvTitle.text = item.title
                 tvSubTitle.text = item.subTitle
-                rootView.setBackgroundColor(getRandomColor())// TODO: set in item
+                rootView.setBackgroundColor(item.color)
 
                 setOnClickListener { listener.onItemClicked(item) }
             }
         }
-
-        private fun getRandomColor(): Int =
-            Random(System.currentTimeMillis()).run {
-                Color.rgb(nextInt(256), nextInt(256), nextInt(256))
-            }
     }
 
     interface Listener {
