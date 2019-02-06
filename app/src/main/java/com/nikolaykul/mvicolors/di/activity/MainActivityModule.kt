@@ -9,7 +9,7 @@ import dagger.android.ContributesAndroidInjector
 interface MainActivityModule {
 
     @PerFragment
-    @ContributesAndroidInjector()
-    fun videoListFragment(): ColorListFragment
+    @ContributesAndroidInjector
+    fun colorListFragment(): ColorListFragment
 
 }
