@@ -7,6 +7,7 @@ import com.nikolaykul.mvicolors.domain.navigation.DummyRouter
 import com.nikolaykul.mvicolors.presentation.base.BaseViewModel
 import com.nikolaykul.mvicolors.presentation.color.list.adapter.ColorListItem
 import com.nikolaykul.mvicolors.presentation.utils.isActive
+import com.nikolaykul.mvicolors.presentation.utils.randomError
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
@@ -47,6 +48,7 @@ class ColorListViewModel @Inject constructor(
 
         bottomItemsDisposable = getColorsUseCase.getColors(currentFilter)
             .map(this::mapToViewItems)
+            .randomError()
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { nextState { ColorListState.Loading } }
             .safeSubscribe(
@@ -73,6 +75,7 @@ class ColorListViewModel @Inject constructor(
             .switchMap {
                 getColorsUseCase.getColors(it)
                     .map(this::mapToViewItems)
+                    .randomError()
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe { nextState { ColorListState.Loading } }
                     .doOnSuccess { items ->
@@ -88,6 +91,7 @@ class ColorListViewModel @Inject constructor(
     private fun loadInitVideos() {
         getColorsUseCase.getColors()
             .map(this::mapToViewItems)
+            .randomError()
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { nextState { ColorListState.Loading } }
             .safeSubscribe(
