@@ -10,17 +10,18 @@ import com.jakewharton.rxbinding3.widget.textChanges
 import com.nikolaykul.shortvids.R
 import com.nikolaykul.shortvids.presentation.base.BaseFragment
 import com.nikolaykul.shortvids.presentation.utils.rv.decorations.VerticalMarginDecorator
+import com.nikolaykul.shortvids.presentation.video.VideoListStateMachine.Action
+import com.nikolaykul.shortvids.presentation.video.VideoListStateMachine.State
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListAdapter
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_video_list.*
 import kotlinx.android.synthetic.main.fragment_video_list_toolbar.*
 import kotlinx.android.synthetic.main.fragment_video_loader.*
-import timber.log.Timber
 
 private const val LOAD_MORE_THRESHOLD = 5
 
-class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
+class VideoListFragment : BaseFragment<State>(), VideoListAdapter.Listener {
 
     override val layoutId = R.layout.fragment_video_list
 
@@ -32,29 +33,18 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
         initList()
         initListeners()
 
-        viewModel.observeState()
-            .safeSubscribe { handleState(it) }
+        viewModel.state
+            .safeSubscribe { render(it) }
+    }
+
+    override fun render(state: State) {
+        vgLoader.isVisible = state.isLoading
+        state.allItems?.let { adapter.setItems(it) }
+        state.error?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
     }
 
     override fun onItemClicked(item: VideoListItem) {
-        viewModel.onVideoItemClicked(item)
-    }
-
-    private fun handleState(state: VideoListState) {
-        Timber.d("NextState -> $state")
-
-        vgLoader.isVisible = state is VideoListState.Loading
-        when (state) {
-            is VideoListState.AllItems -> {
-                adapter.setItems(state.items)
-            }
-            is VideoListState.ExtraBottomItems -> {
-                adapter.addItems(state.items)
-            }
-            is VideoListState.Error -> {
-                Toast.makeText(context, state.msg, Toast.LENGTH_SHORT).show()
-            }
-        }
+        viewModel.actions.onNext(Action.NavigateToDetails(item))
     }
 
     private fun initList() {
@@ -68,7 +58,7 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
                 if (dy > 0 && adapter.itemCount - lastVisiblePosition < LOAD_MORE_THRESHOLD) {
-                    viewModel.onListEndReached()
+                    viewModel.actions.onNext(Action.LoadMoreVideo)
                 }
             }
         })
@@ -77,18 +67,20 @@ class VideoListFragment : BaseFragment(), VideoListAdapter.Listener {
     private fun initListeners() {
         etFilterOptions.textChanges()
             .map { it.trim().toString() }
+            .map { Action.LoadVideo(it) }
             .observeOn(AndroidSchedulers.mainThread())
-            .safeSubscribe { viewModel.onFilterChanged(it) }
+            .subscribe(viewModel.actions)
 
-        fab.setOnClickListener { viewModel.onAddNewVideoClicked() }
+        fab.setOnClickListener { viewModel.actions.onNext(Action.NavigateToAddNewVideo) }
 
         btnClearFilter.setOnClickListener {
             etFilterOptions.text.clear()
-            viewModel.onFilterCancelled()
+            viewModel.actions.onNext(Action.ClearVideoFilter)
         }
 
         btnApplyFilter.setOnClickListener {
-            viewModel.onFilterChanged(etFilterOptions.text.toString())
+            val filter = etFilterOptions.text.toString()
+            viewModel.actions.onNext(Action.LoadVideo(filter))
         }
     }
 

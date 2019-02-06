@@ -20,7 +20,7 @@ import io.reactivex.disposables.Disposable
 import timber.log.Timber
 import javax.inject.Inject
 
-abstract class BaseFragment : Fragment(), HasSupportFragmentInjector {
+abstract class BaseFragment<State> : MviFragment<State>(), HasSupportFragmentInjector {
 
     @Inject lateinit var childFragmentInjector: DispatchingAndroidInjector<Fragment>
     @Inject lateinit var factory: ViewModelFactory
@@ -57,4 +57,9 @@ abstract class BaseFragment : Fragment(), HasSupportFragmentInjector {
     ): Disposable =
         subscribe(onNext, onError, onComplete)
             .also { disposables.add(it) }
+}
+
+
+abstract class MviFragment<State> : Fragment() {
+    abstract fun render(state: State)
 }
