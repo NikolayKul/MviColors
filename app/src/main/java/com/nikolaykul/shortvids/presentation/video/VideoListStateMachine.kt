@@ -107,6 +107,7 @@ private class SideEffectsProvider(
         state: StateAccessor<State>
     ): Observable<Action> =
         actions.filter { it is Action.NavigateToAddNewVideo }
+            .observeOn(AndroidSchedulers.mainThread())
             .flatMap {
                 router.navigateToAddVideo()
                 Observable.empty<Action>()
@@ -117,6 +118,7 @@ private class SideEffectsProvider(
         state: StateAccessor<State>
     ): Observable<Action> =
         actions.ofType(Action.NavigateToDetails::class.java)
+            .observeOn(AndroidSchedulers.mainThread())
             .flatMap {
                 router.navigateToVideoDetails(it.item.id)
                 Observable.empty<Action>()
