@@ -8,7 +8,9 @@ import dagger.android.ContributesAndroidInjector
 
 @Module
 interface MainActivityModule {
+
     @PerFragment
     @ContributesAndroidInjector(modules = [ColorListFragmentModule::class])
     fun colorListFragment(): ColorListFragment
+
 }
