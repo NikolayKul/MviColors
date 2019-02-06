@@ -4,7 +4,6 @@ import android.graphics.Rect
 import android.view.View
 import androidx.annotation.DimenRes
 import androidx.recyclerview.widget.RecyclerView
-import com.nikolaykul.mvicolors.presentation.utils.update
 
 class VerticalMarginDecorator private constructor(
     private var marginPx: Int? = null,
@@ -30,6 +29,16 @@ class VerticalMarginDecorator private constructor(
                 .also { marginPx = it }
             else -> throw IllegalStateException("Empty margin!")
         }
+
+    private fun Rect.update(
+        left: Int = this.left,
+        top: Int = this.top,
+        right: Int = this.right,
+        bottom: Int = this.bottom
+    ) {
+        set(left, top, right, bottom)
+    }
+
 
     companion object {
         fun withPixels(marginPx: Int) = VerticalMarginDecorator(marginPx = marginPx)
