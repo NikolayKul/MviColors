@@ -46,7 +46,7 @@ class VideoListFragment : BaseFragment<State>(), VideoListAdapter.Listener {
     }
 
     override fun onItemClicked(item: VideoListItem) {
-        stateMachine.input.onNext(Action.NavigateToDetails(item))
+        stateMachine.input.accept(Action.NavigateToDetails(item))
     }
 
     private fun initList() {
@@ -60,7 +60,7 @@ class VideoListFragment : BaseFragment<State>(), VideoListAdapter.Listener {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
                 if (dy > 0 && adapter.itemCount - lastVisiblePosition < LOAD_MORE_THRESHOLD) {
-                    stateMachine.input.onNext(Action.LoadMoreVideo)
+                    stateMachine.input.accept(Action.LoadMoreVideo)
                 }
             }
         })
@@ -71,18 +71,18 @@ class VideoListFragment : BaseFragment<State>(), VideoListAdapter.Listener {
             .map { it.trim().toString() }
             .map { Action.LoadVideo(it) }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(stateMachine.input)
+            .safeSubscribe { stateMachine.input.accept(it) }
 
-        fab.setOnClickListener { stateMachine.input.onNext(Action.NavigateToAddNewVideo) }
+        fab.setOnClickListener { stateMachine.input.accept(Action.NavigateToAddNewVideo) }
 
         btnClearFilter.setOnClickListener {
             etFilterOptions.text.clear()
-            stateMachine.input.onNext(Action.ClearVideoFilter)
+            stateMachine.input.accept(Action.ClearVideoFilter)
         }
 
         btnApplyFilter.setOnClickListener {
             val filter = etFilterOptions.text.toString()
-            stateMachine.input.onNext(Action.LoadVideo(filter))
+            stateMachine.input.accept(Action.LoadVideo(filter))
         }
     }
 

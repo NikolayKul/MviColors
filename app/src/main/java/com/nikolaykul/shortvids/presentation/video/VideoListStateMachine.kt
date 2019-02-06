@@ -4,6 +4,8 @@ import com.freeletics.rxredux.Reducer
 import com.freeletics.rxredux.SideEffect
 import com.freeletics.rxredux.StateAccessor
 import com.freeletics.rxredux.reduxStore
+import com.jakewharton.rxrelay2.PublishRelay
+import com.jakewharton.rxrelay2.Relay
 import com.nikolaykul.shortvids.domain.navigation.DummyRouter
 import com.nikolaykul.shortvids.domain.video.GetVideoUseCase
 import com.nikolaykul.shortvids.domain.video.VideoItem
@@ -13,8 +15,6 @@ import com.nikolaykul.shortvids.presentation.video.VideoListStateMachine.State
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.Subject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -24,7 +24,7 @@ class VideoListStateMachine @Inject constructor(
     router: DummyRouter
 ) {
     private val sideEffectsProvider = SideEffectsProvider(getVideoUseCase, router)
-    val input: Subject<Action> = PublishSubject.create()
+    val input: Relay<Action> = PublishRelay.create()
     val state: Observable<State> = createState()
 
     private fun createState(): Observable<State> =
