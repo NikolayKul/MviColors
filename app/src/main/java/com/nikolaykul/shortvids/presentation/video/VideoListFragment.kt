@@ -52,7 +52,7 @@ class VideoListFragment : BaseFragment<VideoListViewModel, VideoListUiEvent, New
     }
 
     override fun onItemClicked(item: VideoListItem) {
-        uiEvents.onNext(VideoListUiEvent.OnVideoItemClicked(item))
+        uiEvents.accept(VideoListUiEvent.OnVideoItemClicked(item))
     }
 
     private fun initList() {
@@ -66,7 +66,7 @@ class VideoListFragment : BaseFragment<VideoListViewModel, VideoListUiEvent, New
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
                 if (dy > 0 && adapter.itemCount - lastVisiblePosition < LOAD_MORE_THRESHOLD) {
-                    uiEvents.onNext(VideoListUiEvent.OnListEndReached)
+                    uiEvents.accept(VideoListUiEvent.OnListEndReached)
                 }
             }
         })
@@ -75,20 +75,20 @@ class VideoListFragment : BaseFragment<VideoListViewModel, VideoListUiEvent, New
     private fun initListeners() {
         etFilterOptions.textChanges()
             .map { it.trim().toString() }
-            .map { VideoListUiEvent.OnFilterChanged(it) as VideoListUiEvent }
+            .map { VideoListUiEvent.OnFilterChanged(it) }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(uiEvents)
+            .safeSubscribe { uiEvents.accept(it) }
 
-        fab.setOnClickListener { uiEvents.onNext(VideoListUiEvent.OnAddNewVideoClicked) }
+        fab.setOnClickListener { uiEvents.accept(VideoListUiEvent.OnAddNewVideoClicked) }
 
         btnClearFilter.setOnClickListener {
             etFilterOptions.text.clear()
-            uiEvents.onNext(VideoListUiEvent.OnFilterCanceled)
+            uiEvents.accept(VideoListUiEvent.OnFilterCanceled)
         }
 
         btnApplyFilter.setOnClickListener {
             val filter = etFilterOptions.text.toString()
-            uiEvents.onNext(VideoListUiEvent.OnFilterChanged(filter))
+            uiEvents.accept(VideoListUiEvent.OnFilterChanged(filter))
         }
     }
 

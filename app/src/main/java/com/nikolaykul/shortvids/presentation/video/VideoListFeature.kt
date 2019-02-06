@@ -5,6 +5,8 @@ import com.badoo.mvicore.element.Bootstrapper
 import com.badoo.mvicore.element.NewsPublisher
 import com.badoo.mvicore.element.Reducer
 import com.badoo.mvicore.feature.BaseFeature
+import com.jakewharton.rxrelay2.PublishRelay
+import com.jakewharton.rxrelay2.Relay
 import com.nikolaykul.shortvids.domain.navigation.DummyRouter
 import com.nikolaykul.shortvids.domain.video.GetVideoUseCase
 import com.nikolaykul.shortvids.domain.video.VideoItem
@@ -12,7 +14,6 @@ import com.nikolaykul.shortvids.presentation.video.VideoListFeature.*
 import com.nikolaykul.shortvids.presentation.video.adapter.VideoListItem
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -117,7 +118,7 @@ private class ActorImpl(
         videos.map { VideoListItem(it.id, it.title, it.subTitle, it.videoPath) }
 
     private inner class FilterLoaderExecutor {
-        private val wishObserver = PublishSubject.create<Wish.LoadVideo>()
+        private val wishObserver: Relay<Wish.LoadVideo> = PublishRelay.create()
         private val loadVideoObservable: Observable<Effect> = wishObserver
             .debounce(FILTER_THRESHOLD_MILLIS, TimeUnit.MILLISECONDS)
             .distinctUntilChanged()
@@ -125,7 +126,7 @@ private class ActorImpl(
             .observeOn(AndroidSchedulers.mainThread())
 
         fun execute(wish: Wish.LoadVideo): Observable<Effect> {
-            wishObserver.onNext(wish)
+            wishObserver.accept(wish)
             return loadVideoObservable
         }
     }
