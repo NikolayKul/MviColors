@@ -8,7 +8,7 @@ class DummyRouter @Inject constructor() {
         Timber.d("navigateToAddVideo")
     }
 
-    fun navigateToVideoDetails(videoId: String) {
+    fun navigateToVideoDetails(videoId: Long) {
         Timber.d("navigateToVideoDetails(videoId=$videoId)")
     }
 }

@@ -1,8 +1,8 @@
 package com.nikolaykul.shortvids.presentation.video.adapter
 
 class VideoListItem(
-    val id: String,
+    val id: Long,
     val title: String,
     val subTitle: String,
-    val videoPath: String
+    val color: Int
 )

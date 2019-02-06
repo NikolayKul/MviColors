@@ -46,16 +46,11 @@ class VideoListAdapter(
             itemView.apply {
                 tvTitle.text = item.title
                 tvSubTitle.text = item.subTitle
-                videoLayer.setBackgroundColor(getRandomColor())
+                videoLayer.setBackgroundColor(item.color)
 
                 setOnClickListener { listener.onItemClicked(item) }
             }
         }
-
-        private fun getRandomColor(): Int =
-            Random(System.currentTimeMillis()).run {
-                Color.rgb(nextInt(256), nextInt(256), nextInt(256))
-            }
     }
 
     interface Listener {

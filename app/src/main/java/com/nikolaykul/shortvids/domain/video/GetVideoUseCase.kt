@@ -13,16 +13,15 @@ class GetVideoUseCase @Inject constructor() {
             .subscribeOn(Schedulers.io())
 
     private fun createVideos(filter: String? = null): List<VideoItem> =
-        (0..100).asSequence()
+        (0..100L).asSequence()
             .map(::createSingleVideo)
-            .filter { filter.isNullOrBlank() || filter.length >= it.id.length }
+            .filter { filter.isNullOrBlank() || filter.length >= it.id }    // lol
             .toList()
 
-    private fun createSingleVideo(i: Int) =
+    private fun createSingleVideo(i: Long) =
         VideoItem(
-            id = "$i",
+            id = i,
             title = "Title for $i",
-            subTitle = "Some lorem ipsum for the $i item",
-            videoPath = "Actually there's no any videoPath at the moment"
+            subTitle = "Some lorem ipsum for the $i item"
         )
 }

@@ -1,5 +1,6 @@
 package com.nikolaykul.shortvids.presentation.video
 
+import android.graphics.Color
 import com.freeletics.rxredux.Reducer
 import com.freeletics.rxredux.SideEffect
 import com.freeletics.rxredux.StateAccessor
@@ -18,6 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.random.Random
 
 class VideoListStateMachine @Inject constructor(
     getVideoUseCase: GetVideoUseCase,
@@ -136,8 +138,13 @@ private class SideEffectsProvider(
             .startWith(Action.Loading)
             .onErrorReturn { Action.Error(it.localizedMessage) }
 
-    private fun mapToViewItems(videos: List<VideoItem>) =
-        videos.map { VideoListItem(it.id, it.title, it.subTitle, it.videoPath) }
+    private fun mapToViewItems(videos: List<VideoItem>): List<VideoListItem> =
+        videos.map {
+            val color = Random(it.id).run {
+                Color.rgb(nextInt(256), nextInt(256), nextInt(256))
+            }
+            VideoListItem(it.id, it.title, it.subTitle, color)
+        }
 
     companion object {
         private const val FILTER_THRESHOLD_MILLIS = 200L
