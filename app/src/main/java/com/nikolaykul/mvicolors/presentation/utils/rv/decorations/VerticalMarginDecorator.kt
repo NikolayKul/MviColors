@@ -39,7 +39,6 @@ class VerticalMarginDecorator private constructor(
         set(left, top, right, bottom)
     }
 
-
     companion object {
         fun withPixels(marginPx: Int) = VerticalMarginDecorator(marginPx = marginPx)
         fun withDimen(marginRes: Int) = VerticalMarginDecorator(marginRes = marginRes)
