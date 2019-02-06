@@ -7,11 +7,12 @@ import com.badoo.mvicore.element.Reducer
 import com.badoo.mvicore.feature.BaseFeature
 import com.jakewharton.rxrelay2.PublishRelay
 import com.jakewharton.rxrelay2.Relay
-import com.nikolaykul.mvicolors.domain.navigation.DummyRouter
-import com.nikolaykul.mvicolors.domain.color.GetColorsUseCase
 import com.nikolaykul.mvicolors.domain.color.ColorItem
+import com.nikolaykul.mvicolors.domain.color.GetColorsUseCase
+import com.nikolaykul.mvicolors.domain.navigation.DummyRouter
 import com.nikolaykul.mvicolors.presentation.color.list.ColorListFeature.*
 import com.nikolaykul.mvicolors.presentation.color.list.adapter.ColorListItem
+import com.nikolaykul.mvicolors.presentation.utils.randomError
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.concurrent.TimeUnit
@@ -103,14 +104,8 @@ private class ActorImpl(
                 val items = mapToViewItems(it)
                 Effect.AllItemsLoaded(items, filter) as Effect
             }
-            .flatMapObservable {
-                // TODO: ext
-                if (System.currentTimeMillis() % 2 > 0) {
-                    Observable.just(it)
-                } else {
-                    Observable.error(Throwable("Random error"))
-                }
-            }
+            .toObservable()
+            .randomError()
             .observeOn(AndroidSchedulers.mainThread())
             .startWith(Effect.Loading)
             .onErrorReturn { Effect.Error(it.localizedMessage) }
