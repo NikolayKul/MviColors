@@ -7,7 +7,7 @@ android {
     compileSdkVersion versions.sdk_compile
 
     defaultConfig {
-        applicationId "com.nikolaykul.shortvids"
+        applicationId "com.nikolaykul.mvicolors"
         minSdkVersion versions.sdk_min
         targetSdkVersion versions.sdk_target
         versionCode 1
