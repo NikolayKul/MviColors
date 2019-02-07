@@ -1,7 +1,0 @@
-<resources>
-    <string name="app_name">MviColors</string>
-    <string name="action_settings">Settings</string>
-    <string name="apply">Apply</string>
-    <string name="clear">Clear</string>
-    <string name="filter_options">Filter options</string>
-</resources>
