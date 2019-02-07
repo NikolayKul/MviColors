@@ -7,13 +7,13 @@ import com.freeletics.rxredux.StateAccessor
 import com.freeletics.rxredux.reduxStore
 import com.jakewharton.rxrelay2.PublishRelay
 import com.jakewharton.rxrelay2.Relay
-import com.nikolaykul.mvicolors.domain.navigation.DummyRouter
-import com.nikolaykul.mvicolors.domain.color.GetColorsUseCase
 import com.nikolaykul.mvicolors.domain.color.ColorItem
-import com.nikolaykul.mvicolors.presentation.utils.randomError
+import com.nikolaykul.mvicolors.domain.color.GetColorsUseCase
+import com.nikolaykul.mvicolors.domain.navigation.DummyRouter
 import com.nikolaykul.mvicolors.presentation.color.list.ColorListStateMachine.Action
 import com.nikolaykul.mvicolors.presentation.color.list.ColorListStateMachine.State
 import com.nikolaykul.mvicolors.presentation.color.list.adapter.ColorListItem
+import com.nikolaykul.mvicolors.presentation.utils.randomError
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
@@ -41,7 +41,7 @@ class ColorListStateMachine @Inject constructor(
 
     data class State(
         val isLoading: Boolean = false,
-        val allItems: List<ColorListItem>? = null,
+        val items: List<ColorListItem> = emptyList(),
         val currentFilter: String? = null,
         val error: String? = null
     )
@@ -54,7 +54,8 @@ class ColorListStateMachine @Inject constructor(
         object NavigateToAddNewColor : Action()
 
         object Loading : Action()
-        class AllItemsLoaded(val allItems: List<ColorListItem>, val filter: String?) : Action()
+        class NewItemsLoaded(val items: List<ColorListItem>, val filter: String?) : Action()
+        class ExtraItemsLoaded(val items: List<ColorListItem>) : Action()
         class Error(val msg: String) : Action()
     }
 }
@@ -78,7 +79,7 @@ private class SideEffectsProvider(
         actions: Observable<Action>,
         state: StateAccessor<State>
     ): Observable<out Action> =
-        doLoadColors(null)
+        doLoadNewColors(null)
 
     private fun loadColors(
         actions: Observable<Action>,
@@ -87,14 +88,14 @@ private class SideEffectsProvider(
         actions.ofType(Action.LoadColors::class.java)
             .debounce(FILTER_THRESHOLD_MILLIS, TimeUnit.MILLISECONDS)
             .distinctUntilChanged()
-            .switchMap { doLoadColors(it.filter) }
+            .switchMap { doLoadNewColors(it.filter) }
 
     private fun clearFilter(
         actions: Observable<Action>,
         state: StateAccessor<State>
     ): Observable<Action> =
         actions.ofType(Action.ClearColorsFilter::class.java)
-            .flatMap { doLoadColors(state().currentFilter) }
+            .flatMap { doLoadNewColors(state().currentFilter) }
 
     private fun loadMoreColors(
         actions: Observable<Action>,
@@ -102,7 +103,7 @@ private class SideEffectsProvider(
     ): Observable<Action> =
         actions.ofType(Action.LoadMoreColors::class.java)
             .filter { !state().isLoading }
-            .flatMap { doLoadColors(state().currentFilter) }
+            .flatMap { doLoadExtraColors(state().currentFilter) }
 
     private fun navigateToAddNewColors(
         actions: Observable<Action>,
@@ -126,11 +127,20 @@ private class SideEffectsProvider(
                 Observable.empty<Action>()
             }
 
-    private fun doLoadColors(filter: String?): Observable<out Action> =
+    private fun doLoadExtraColors(filter: String?): Observable<out Action> =
+        doLoadNewColors(filter)
+            .map { action ->
+                when (action) {
+                    is Action.NewItemsLoaded -> Action.ExtraItemsLoaded(action.items)
+                    else -> action
+                }
+            }
+
+    private fun doLoadNewColors(filter: String?): Observable<out Action> =
         getColorsUseCase.getColors(filter)
             .map {
                 val items = mapToViewItems(it)
-                Action.AllItemsLoaded(items, filter) as Action
+                Action.NewItemsLoaded(items, filter) as Action
             }
             .toObservable()
             .randomError()
@@ -158,10 +168,15 @@ private class ReducerImpl : Reducer<State, Action> {
             isLoading = true,
             error = null
         )
-        is Action.AllItemsLoaded -> state.copy(
+        is Action.NewItemsLoaded -> state.copy(
             isLoading = false,
-            allItems = action.allItems,
+            items = action.items,
             currentFilter = action.filter,
+            error = null
+        )
+        is Action.ExtraItemsLoaded -> state.copy(
+            isLoading = false,
+            items = state.items + action.items,
             error = null
         )
         is Action.Error -> state.copy(

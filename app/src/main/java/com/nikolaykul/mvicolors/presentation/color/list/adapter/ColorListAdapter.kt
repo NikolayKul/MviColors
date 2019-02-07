@@ -4,19 +4,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.nikolaykul.mvicolors.R
+import com.nikolaykul.mvicolors.presentation.base.adapter.DiffAdapter
 import com.nikolaykul.mvicolors.presentation.utils.inflate
 import kotlinx.android.synthetic.main.fragment_color_list_item.view.*
 
 class ColorListAdapter(
     private val listener: Listener
-) : RecyclerView.Adapter<ColorListAdapter.ViewHolder>() {
-    private val items: MutableList<ColorListItem> = mutableListOf()
-
-    fun setItems(newItems: List<ColorListItem>) {
-        items.clear()
-        items.addAll(newItems)
-        notifyDataSetChanged()
-    }
+) : DiffAdapter<ColorListItem, ColorListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = parent.inflate(R.layout.fragment_color_list_item, parent)
@@ -27,13 +21,7 @@ class ColorListAdapter(
         holder.bind(items[position])
     }
 
-    override fun getItemCount(): Int = items.size
-
-    class ViewHolder(
-        view: View,
-        private val listener: Listener
-    ) : RecyclerView.ViewHolder(view) {
-
+    class ViewHolder(view: View, private val listener: Listener) : RecyclerView.ViewHolder(view) {
         fun bind(item: ColorListItem) {
             itemView.apply {
                 tvTitle.text = item.title
