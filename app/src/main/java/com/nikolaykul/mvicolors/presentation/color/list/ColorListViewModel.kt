@@ -29,7 +29,7 @@ class ColorListViewModel @Inject constructor(
     private var currentFilter: String? = null
 
     override fun onViewSubscribed() {
-        loadInitVideos()
+        loadInitColors()
         observeFilter()
     }
 
@@ -88,7 +88,7 @@ class ColorListViewModel @Inject constructor(
             .safeSubscribe()
     }
 
-    private fun loadInitVideos() {
+    private fun loadInitColors() {
         getColorsUseCase.getColors()
             .map(this::mapToViewItems)
             .randomError()
