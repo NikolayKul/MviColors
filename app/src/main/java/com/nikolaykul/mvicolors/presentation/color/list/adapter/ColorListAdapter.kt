@@ -35,11 +35,7 @@ class ColorListAdapter(
 
     override fun getItemCount(): Int = items.size
 
-    class ViewHolder(
-        view: View,
-        private val listener: Listener
-    ) : RecyclerView.ViewHolder(view) {
-
+    class ViewHolder(view: View, private val listener: Listener) : RecyclerView.ViewHolder(view) {
         fun bind(item: ColorListItem) {
             itemView.apply {
                 tvTitle.text = item.title
