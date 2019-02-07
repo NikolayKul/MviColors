@@ -21,7 +21,7 @@ class ColorListViewModel @Inject constructor(
     private val getColorsUseCase: GetColorsUseCase,
     private val router: DummyRouter
 ) : BaseViewModel<ColorListState>(
-    initState = ColorListState.AllItems(emptyList())
+    initState = ColorListState.NewItems(emptyList())
 ) {
 
     private var filterRelay = PublishRelay.create<String>()
@@ -79,7 +79,7 @@ class ColorListViewModel @Inject constructor(
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe { nextState { ColorListState.Loading } }
                     .doOnSuccess { items ->
-                        nextState { ColorListState.AllItems(items) }
+                        nextState { ColorListState.NewItems(items) }
                     }
                     .doOnError(this::onLoadingError)
                     .toObservable()
@@ -96,7 +96,7 @@ class ColorListViewModel @Inject constructor(
             .doOnSubscribe { nextState { ColorListState.Loading } }
             .safeSubscribe(
                 onSuccess = { items ->
-                    nextState { ColorListState.AllItems(items) }
+                    nextState { ColorListState.NewItems(items) }
                 },
                 onError = ::onLoadingError
             )

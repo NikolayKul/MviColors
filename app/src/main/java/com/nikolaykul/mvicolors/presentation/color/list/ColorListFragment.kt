@@ -45,7 +45,7 @@ class ColorListFragment : BaseFragment(), ColorListAdapter.Listener {
 
         vgLoader.isVisible = state is ColorListState.Loading
         when (state) {
-            is ColorListState.AllItems -> {
+            is ColorListState.NewItems -> {
                 adapter.setItems(state.items)
             }
             is ColorListState.ExtraBottomItems -> {
