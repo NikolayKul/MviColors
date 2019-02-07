@@ -33,7 +33,7 @@ class ColorListFeature @Inject constructor(
 ) {
     data class State(
         val isLoading: Boolean = false,
-        val allItems: List<ColorListItem>? = null,
+        val items: List<ColorListItem> = emptyList(),
         val currentFilter: String? = null
     )
 
@@ -52,7 +52,8 @@ class ColorListFeature @Inject constructor(
 
     sealed class Effect {
         object Loading : Effect()
-        class AllItemsLoaded(val allItems: List<ColorListItem>, val filter: String?) : Effect()
+        class NewItemsLoaded(val items: List<ColorListItem>, val filter: String?) : Effect()
+        class ExtraItemsLoaded(val items: List<ColorListItem>) : Effect()
         class Error(val msg: String) : Effect()
     }
 
@@ -77,17 +78,17 @@ private class ActorImpl(
 
     override fun invoke(state: State, action: Action): Observable<out Effect> = when (action) {
         is Action.WishWrapper -> executeWish(state, action.wish)
-        is Action.LoadInitColors -> doLoadColors(null)
+        is Action.LoadInitColors -> doLoadNewColors(null)
     }
 
     private fun executeWish(state: State, wish: Wish): Observable<out Effect> = when (wish) {
         is Wish.LoadColors -> filterLoaderExecutor.execute(wish)
-        is Wish.ClearColorFilter -> doLoadColors(null)
+        is Wish.ClearColorFilter -> doLoadNewColors(null)
         is Wish.LoadMoreColors -> {
             if (state.isLoading) {
                 Observable.empty()
             } else {
-                doLoadColors(state.currentFilter)
+                doLoadExtraColors(state.currentFilter)
             }
         }
         is Wish.NavigateToColorDetails -> {
@@ -100,11 +101,20 @@ private class ActorImpl(
         }
     }
 
-    private fun doLoadColors(filter: String?): Observable<out Effect> =
+    private fun doLoadExtraColors(filter: String?): Observable<out Effect> =
+        doLoadNewColors(filter)
+            .map { effect ->
+                when (effect) {
+                    is Effect.NewItemsLoaded -> Effect.ExtraItemsLoaded(effect.items)
+                    else -> effect
+                }
+            }
+
+    private fun doLoadNewColors(filter: String?): Observable<out Effect> =
         getColorsUseCase.getColors(filter)
             .map {
                 val items = mapToViewItems(it)
-                Effect.AllItemsLoaded(items, filter) as Effect
+                Effect.NewItemsLoaded(items, filter) as Effect
             }
             .toObservable()
             .randomError()
@@ -125,7 +135,7 @@ private class ActorImpl(
         private val loadColorsObservable: Observable<Effect> = wishObserver
             .debounce(FILTER_THRESHOLD_MILLIS, TimeUnit.MILLISECONDS)
             .distinctUntilChanged()
-            .switchMap { doLoadColors(it.filter) }
+            .switchMap { doLoadNewColors(it.filter) }
             .observeOn(AndroidSchedulers.mainThread())
 
         fun execute(wish: Wish.LoadColors): Observable<Effect> {
@@ -143,10 +153,14 @@ private class ActorImpl(
 private class ReducerImpl : Reducer<State, Effect> {
     override fun invoke(state: State, effect: Effect): State = when (effect) {
         is Effect.Loading -> state.copy(isLoading = true)
-        is Effect.AllItemsLoaded -> state.copy(
+        is Effect.NewItemsLoaded -> state.copy(
             isLoading = false,
-            allItems = effect.allItems,
+            items = effect.items,
             currentFilter = effect.filter
+        )
+        is Effect.ExtraItemsLoaded -> state.copy(
+            isLoading = false,
+            items = state.items + effect.items
         )
         else -> state.copy(isLoading = false)
     }

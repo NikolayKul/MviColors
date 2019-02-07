@@ -42,7 +42,7 @@ class ColorListFragment : BaseFragment<ColorListViewModel, ColorListUiEvent, New
 
     override fun consumeViewModel(vm: ColorListViewModel) {
         vgLoader.isVisible = vm.isLoading
-        vm.items?.let { adapter.setItems(it) }
+        adapter.items = vm.items
     }
 
     override fun consumeNews(news: News) {

@@ -22,7 +22,7 @@ class ColorListBinding @Inject constructor(
 private object ViewModelMapper : (State) -> ColorListViewModel {
     override fun invoke(state: State) = ColorListViewModel(
         isLoading = state.isLoading,
-        items = state.allItems
+        items = state.items
     )
 }
 
