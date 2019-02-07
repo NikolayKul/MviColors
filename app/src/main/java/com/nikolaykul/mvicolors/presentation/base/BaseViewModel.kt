@@ -2,16 +2,16 @@ package com.nikolaykul.mvicolors.presentation.base
 
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
+import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.BehaviorSubject
 import timber.log.Timber
 
 abstract class BaseViewModel<TState : ViewState>(initState: TState) : ViewModel() {
-    private val stateRelay by lazy { BehaviorSubject.createDefault(initState) }
+    private val stateRelay by lazy { BehaviorRelay.createDefault(initState) }
     private val disposables = CompositeDisposable()
 
     override fun onCleared() {
@@ -27,7 +27,7 @@ abstract class BaseViewModel<TState : ViewState>(initState: TState) : ViewModel(
     fun nextState(reducer: (TState) -> TState) {
         stateRelay.value!!
             .let(reducer)
-            .also(stateRelay::onNext)
+            .also(stateRelay::accept)
     }
 
     protected open fun onViewSubscribed() {

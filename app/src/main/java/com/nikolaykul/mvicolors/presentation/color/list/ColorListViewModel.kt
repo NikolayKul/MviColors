@@ -1,6 +1,7 @@
 package com.nikolaykul.mvicolors.presentation.color.list
 
 import android.graphics.Color
+import com.jakewharton.rxrelay2.PublishRelay
 import com.nikolaykul.mvicolors.domain.color.ColorItem
 import com.nikolaykul.mvicolors.domain.color.GetColorsUseCase
 import com.nikolaykul.mvicolors.domain.navigation.DummyRouter
@@ -10,7 +11,6 @@ import com.nikolaykul.mvicolors.presentation.utils.isActive
 import com.nikolaykul.mvicolors.presentation.utils.randomError
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.random.Random
@@ -24,7 +24,7 @@ class ColorListViewModel @Inject constructor(
     initState = ColorListState.AllItems(emptyList())
 ) {
 
-    private var filterSubject = PublishSubject.create<String>()
+    private var filterRelay = PublishRelay.create<String>()
     private var bottomItemsDisposable: Disposable? = null
     private var currentFilter: String? = null
 
@@ -34,11 +34,11 @@ class ColorListViewModel @Inject constructor(
     }
 
     fun onFilterChanged(newFilter: String) {
-        filterSubject.onNext(newFilter)
+        filterRelay.accept(newFilter)
     }
 
     fun onFilterCancelled() {
-        filterSubject.onNext("")
+        filterRelay.accept("")
     }
 
     fun onListEndReached() {
@@ -68,7 +68,7 @@ class ColorListViewModel @Inject constructor(
     }
 
     private fun observeFilter() {
-        filterSubject
+        filterRelay
             .debounce(FILTER_THRESHOLD_MILLIS, TimeUnit.MILLISECONDS)
             .distinctUntilChanged()
             .doOnNext { currentFilter = it }
